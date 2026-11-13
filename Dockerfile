@@ -129,6 +129,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy vendor from composer-deps stage for better caching
 COPY --chown=${USER}:${USER} --from=composer-deps /app/vendor ./vendor
+# Modules installed from Packagist are git-ignored, so they come from the install stage.
+COPY --chown=${USER}:${USER} --from=composer-deps /app/modules ./modules
 
 # Copy composer files (needed for autoloader generation)
 COPY --chown=${USER}:${USER} composer.json composer.lock ./
