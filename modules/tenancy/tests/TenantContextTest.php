@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Liberu\Foundation\Tenancy\Tests;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Facade;
 use Liberu\Foundation\Tenancy\Jobs\Middleware\RestoreTenantContext;
 use Liberu\Foundation\Tenancy\TenancyServiceProvider;
 use Liberu\Foundation\Tenancy\TenantContext;
@@ -19,17 +21,28 @@ class TenantContextTest extends TestCase
 {
     private Application $app;
 
+    private Container $previousContainer;
+
+    private ?ApplicationContract $previousFacadeApplication;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->previousContainer = Container::getInstance();
+        $this->previousFacadeApplication = Facade::getFacadeApplication();
         $this->app = new Application(sys_get_temp_dir());
-        (new TenancyServiceProvider($this->app))->register();
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication($this->app);
+        $provider = new TenancyServiceProvider($this->app);
+        $provider->register();
     }
 
     protected function tearDown(): void
     {
         $this->app->flush();
-        Container::setInstance(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication($this->previousFacadeApplication);
+        Container::setInstance($this->previousContainer);
         parent::tearDown();
     }
 
