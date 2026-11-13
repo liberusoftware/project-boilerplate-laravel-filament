@@ -1,1 +1,10 @@
-{}
+{
+  "liberusoftware/tenancy": {
+    "path": "modules/tenancy",
+    "reference": "5c079502cf9c82c304f37eab141c8c7d5a77b2b7",
+    "repository": "https://github.com/liberusoftware/module-tenancy",
+    "source_signature": "d469d350ee02b7822a5fa89a3d1bcf1bbd06fa4f8e46fc06e6644ffc88c0b8e5",
+    "source_tree": "04f69949afdcdb6c12817d536fee1706df06aa5d",
+    "version": "1.2.2"
+  }
+}
