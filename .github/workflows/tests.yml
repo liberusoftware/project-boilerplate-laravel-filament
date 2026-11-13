@@ -12,6 +12,9 @@ permissions:
 
 jobs:
   tests:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -54,7 +57,7 @@ jobs:
       # phpstan.neon existed and was configured at level 9 while nothing ever
       # ran it. Scope and level are explained in that file.
       - name: Static analysis
-        run: vendor/bin/phpstan analyse --no-progress
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
       - name: Generate application key
         run: php artisan key:generate
@@ -67,7 +70,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
           files: ./coverage.xml
           disable_search: true
           flags: unittests
