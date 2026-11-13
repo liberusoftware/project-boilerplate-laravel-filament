@@ -6668,16 +6668,16 @@
         },
         {
             "name": "liberusoftware/module-manager",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-module-manager.git",
-                "reference": "372c9fc3cf688967bed7ffb315727cd7a7b4125e"
+                "reference": "b06e3aec4bb45d74c0ecf0bdfb52964d07e714ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liberusoftware/module-module-manager/zipball/372c9fc3cf688967bed7ffb315727cd7a7b4125e",
-                "reference": "372c9fc3cf688967bed7ffb315727cd7a7b4125e",
+                "url": "https://api.github.com/repos/liberusoftware/module-module-manager/zipball/b06e3aec4bb45d74c0ecf0bdfb52964d07e714ce",
+                "reference": "b06e3aec4bb45d74c0ecf0bdfb52964d07e714ce",
                 "shasum": ""
             },
             "require": {
@@ -6709,10 +6709,10 @@
             "description": "Deterministic manifest discovery and runtime enablement for Liberu modules.",
             "support": {
                 "issues": "https://github.com/liberusoftware/module-module-manager/issues",
-                "source": "https://github.com/liberusoftware/module-module-manager/tree/1.9.0"
+                "source": "https://github.com/liberusoftware/module-module-manager/tree/1.9.1"
             },
-            "time": "2026-11-10T16:14:46+00:00",
-            "published-time": "2026-11-10T16:15:10+00:00"
+            "time": "2026-11-12T23:08:09+00:00",
+            "published-time": "2026-11-12T23:23:33+00:00"
         },
         {
             "name": "liberusoftware/module-manager-filament",
