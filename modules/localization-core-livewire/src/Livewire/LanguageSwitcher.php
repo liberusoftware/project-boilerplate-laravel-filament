@@ -33,7 +33,11 @@ final class LanguageSwitcher extends Component
         $this->currentLocale = $locale;
         $referer = request()->header('Referer');
         $base = url('/');
-        $this->redirect(is_string($referer) && str_starts_with($referer, $base) ? $referer : '/');
+        $safeReferer = is_string($referer) && ($referer === $base
+            || str_starts_with($referer, $base.'/')
+            || str_starts_with($referer, $base.'?')
+            || str_starts_with($referer, $base.'#'));
+        $this->redirect($safeReferer ? $referer : '/');
     }
 
     public function render(): View

@@ -4,10 +4,11 @@
   "type": "liberu-module",
   "license": "MIT",
   "require": {
-    "php": "^8.5",
     "illuminate/contracts": "^13.38.0",
+    "illuminate/http": "^13.38.0",
     "illuminate/support": "^13.38.0",
-    "liberusoftware/module-manager": "^1.0"
+    "liberusoftware/module-manager": "^1.0",
+    "php": "^8.5"
   },
   "autoload": {
     "psr-4": {
@@ -19,7 +20,7 @@
       "name": "currency-context"
     }
   },
-  "version": "1.4.1",
+  "version": "1.6.1",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\Currency\\Tests\\": "tests/"
@@ -30,7 +31,8 @@
     "pestphp/pest": "^5.3.3"
   },
   "scripts": {
-    "test": "pest"
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=100"
   },
   "config": {
     "allow-plugins": {

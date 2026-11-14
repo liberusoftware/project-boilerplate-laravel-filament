@@ -2,6 +2,7 @@
 
 use Liberu\Foundation\Localization\Translation\TranslationRegistry;
 use Liberu\Localization\Contracts\TranslationProvider;
+use Liberu\Localization\Contracts\TranslationProviderRegistry;
 
 it('registers translation providers behind the neutral contract', function () {
     $provider = new class() implements TranslationProvider
@@ -60,3 +61,11 @@ it('rejects duplicate provider names', function () {
     $registry->register($provider);
     $registry->register($provider);
 })->throws(InvalidArgumentException::class);
+
+it('rejects unknown provider names with an explicit error', function () {
+    expect(fn () => (new TranslationRegistry())->get('missing'))->toThrow(InvalidArgumentException::class, 'Unknown translation provider [missing].');
+});
+
+it('resolves the neutral registry contract to the shared package instance', function () {
+    expect(app(TranslationProviderRegistry::class))->toBe(app(TranslationRegistry::class));
+});

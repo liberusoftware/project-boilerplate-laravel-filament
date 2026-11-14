@@ -2,4 +2,4 @@
 
 use Liberu\PackageTestbench\PackageTestCase;
 
-pest()->extend(PackageTestCase::class)->in('Unit');
+pest()->extend(PackageTestCase::class)->in('Unit', 'Feature');

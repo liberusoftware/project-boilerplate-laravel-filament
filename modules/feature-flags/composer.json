@@ -19,7 +19,7 @@
       "name": "feature-flags"
     }
   },
-  "version": "1.4.1",
+  "version": "1.4.14",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\FeatureFlags\\Tests\\": "tests/"
@@ -30,7 +30,8 @@
     "pestphp/pest": "^5.3.3"
   },
   "scripts": {
-    "test": "pest"
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=100"
   },
   "config": {
     "allow-plugins": {

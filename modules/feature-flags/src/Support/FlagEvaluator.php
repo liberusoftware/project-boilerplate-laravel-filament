@@ -4,7 +4,7 @@ namespace Liberu\Foundation\FeatureFlags\Support;
 
 final class FlagEvaluator
 {
-    /** @param array{enabled?:bool,percentage?:int,environments?:list<string>,tenants?:list<string|int>,actors?:list<string|int>} $rule */
+    /** @param array{enabled?:bool,expires_at?:string,percentage?:int,environments?:list<string>,tenants?:list<string|int>,actors?:list<string|int>} $rule */
     public function enabled(string $key, array $rule, string $environment, string|int|null $tenant = null, string|int|null $actor = null): bool
     {
         if (! ($rule['enabled'] ?? false)) {

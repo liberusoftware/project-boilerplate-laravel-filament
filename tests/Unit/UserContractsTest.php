@@ -18,3 +18,11 @@ it('implements the Filament tenancy contracts', function () {
         ->toContain(HasTenants::class)
         ->toContain(HasDefaultTenant::class);
 });
+
+it('preserves an external profile photo URL when serializing the user', function () {
+    $user = User::factory()->make();
+    $user->profile_photo_path = 'https://images.example.test/avatar.png';
+
+    expect($user->profile_photo_url)->toBe('https://images.example.test/avatar.png')
+        ->and($user->toArray()['profile_photo_url'])->toBe('https://images.example.test/avatar.png');
+});

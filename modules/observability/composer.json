@@ -20,7 +20,7 @@
       "name": "observability"
     }
   },
-  "version": "1.4.1",
+  "version": "1.4.8",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\Observability\\Tests\\": "tests/"
@@ -31,7 +31,8 @@
     "pestphp/pest": "^5.3.3"
   },
   "scripts": {
-    "test": "pest"
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=100"
   },
   "config": {
     "allow-plugins": {

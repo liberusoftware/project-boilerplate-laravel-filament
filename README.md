@@ -122,6 +122,14 @@ npm run build
 
 The test suite exercises application behaviour and every installed module provider. Package architecture tests verify metadata, declared dependencies, host isolation, UI boundaries, and Composer ownership.
 
+Legacy module contracts that depend on CRM can use an installed CRM checkout as a host fixture while executing this project's actual module source:
+
+```bash
+composer test:module-host -- ../crm-laravel modules/integrations --coverage-clover=/tmp/integrations-host.xml
+```
+
+The runner forces an in-memory SQLite database, uses isolated temporary storage, and limits the component report to the selected module's entire `src/` tree. Its report supplements the application and native module reports. When PCOV is loaded through a separate extension file, set `LIBERU_PCOV_EXTENSION` to that file for the child PHP process.
+
 ### Publishing the component repositories
 
 The publishing helper derives repository names from directory names, using

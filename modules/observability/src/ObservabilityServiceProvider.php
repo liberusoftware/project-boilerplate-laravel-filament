@@ -2,6 +2,8 @@
 
 namespace Liberu\Foundation\Observability;
 
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Liberu\Foundation\Observability\Contracts\Metrics;
@@ -25,8 +27,10 @@ final class ObservabilityServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        $this->app->make('router')->pushMiddlewareToGroup('web', CorrelationId::class);
-        $this->app->make('router')->pushMiddlewareToGroup('api', CorrelationId::class);
+        $this->callAfterResolving(HttpKernel::class, function (Kernel $kernel): void {
+            $kernel->appendMiddlewareToGroup('web', CorrelationId::class);
+            $kernel->appendMiddlewareToGroup('api', CorrelationId::class);
+        });
         Gate::define('viewPulse', fn (ObservabilityActor $actor): bool => $actor->isAdmin());
     }
 }

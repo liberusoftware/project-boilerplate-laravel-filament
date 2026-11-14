@@ -90,3 +90,7 @@ Focused issues and tested pull requests are welcome in the [GitHub repository](h
 ## Contributors
 
 Thank you to everyone who helps improve Liberu. [View the contributors graph](https://github.com/liberusoftware/module-two-factor-authentication/graphs/contributors).
+
+### Existing identity schemas
+
+The identity migration adds only missing two-factor columns and preserves existing enrollment data, including partially provisioned user tables. Rolling back this adapter retains the shared identity credentials and recovery codes.

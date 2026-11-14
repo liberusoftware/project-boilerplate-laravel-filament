@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Liberu\Foundation\Localization\Context\LocaleContext;
+use Liberu\Foundation\Localization\Context\LocaleResolver;
 use Liberu\Foundation\Localization\Http\Middleware\SetLocale;
 use Liberu\PackageTestbench\TestUser;
 
@@ -80,4 +82,12 @@ test('set locale middleware uses default locale when no preference found', funct
 
         return response('OK');
     });
+});
+
+it('preserves a valid session preference when a request submits an unsupported locale', function () {
+    Session::put('locale', 'fr');
+    $request = Request::create('/', 'GET', ['locale' => 'unsupported']);
+    $response = (new SetLocale(app(LocaleResolver::class)))->handle($request, fn () => response('done', 202));
+    expect($response->getStatusCode())->toBe(202)->and(Session::get('locale'))->toBe('fr')
+        ->and($request->attributes->get(LocaleContext::class)->locale)->toBe('fr');
 });

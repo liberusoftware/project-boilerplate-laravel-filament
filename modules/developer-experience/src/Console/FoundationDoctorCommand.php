@@ -22,7 +22,9 @@ final class FoundationDoctorCommand extends Command
         $errors = array_merge($errors, $validator->validate($registry, app()->version()));
         foreach ($errors as $error) {
             $this->error($error);
-        }if ($errors === []) {
+        }
+
+        if ($errors === []) {
             $this->info('Foundation checks passed.');
         }
 

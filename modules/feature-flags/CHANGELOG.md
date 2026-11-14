@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.14
+
+- Document the supported expiry rule type.
+- Test expiry, strict targeting, stable percentage cohorts, and reversible flag storage migrations.
+- Enforce 100% source coverage and PHPStan level 10 in CI.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

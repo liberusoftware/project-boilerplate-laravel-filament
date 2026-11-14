@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.1 - 2026-11-13
+
+- Use a single readiness snapshot so response status and check details remain consistent.
+- Test readiness checks, environment validation, clocks, identifiers, and secure response headers.
+- Enforce 100% source line coverage in CI and `composer test:coverage`.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

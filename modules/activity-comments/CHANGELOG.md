@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.15 - 2026-11-13
+
+- Test all visibility permission combinations and migration installation and rollback.
+- Enforce 100% source line coverage in CI and the `test:coverage` Composer script.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

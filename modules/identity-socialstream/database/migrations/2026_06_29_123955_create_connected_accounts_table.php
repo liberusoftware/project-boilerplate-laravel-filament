@@ -11,6 +11,10 @@ return new class() extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('connected_accounts')) {
+            return;
+        }
+
         Schema::create('connected_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
@@ -37,6 +41,7 @@ return new class() extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('connected_accounts');
+        // Linked identities and credentials can be shared with the host identity module.
+        // Rolling back the adapter must retain those accounts.
     }
 };

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1 - 2026-11-13
+
+- Preserve exact decimal formatting for the full signed integer range, including the smallest negative amount.
+- Cover currency metadata, scoped preferences, money arithmetic, exchange-rate validation and staleness, formatting failures, and migration rollback.
+- Consolidate the existing opt-in exchange-rate provider and converter from the real-estate host, with isolated HTTP and cache tests.
+- Enforce 100% source line coverage in CI and `composer test:coverage`.
+
 ## 1.2.1 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

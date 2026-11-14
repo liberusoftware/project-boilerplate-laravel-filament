@@ -38,38 +38,38 @@
         "liberusoftware/files-media": "^1.0",
         "liberusoftware/identity-core": "^1.0",
         "liberusoftware/identity-core-filament": "^1.0",
-        "liberusoftware/identity-socialstream": "^1.0",
+        "liberusoftware/identity-socialstream": "^1.8.2",
         "liberusoftware/import-export": "^1.0",
-        "liberusoftware/integrations": "^1.0",
+        "liberusoftware/integrations": "^1.8.2",
         "liberusoftware/jetstream-bridge": "^1.0",
         "liberusoftware/localization-contracts": "^1.0",
-        "liberusoftware/localization-core": "^1.0",
-        "liberusoftware/localization-core-livewire": "^1.0",
-        "liberusoftware/localization-mymemory": "^1.0",
-        "liberusoftware/module-manager": "^1.9",
-        "liberusoftware/module-manager-filament": "^1.11",
+        "liberusoftware/localization-core": "^1.5.1",
+        "liberusoftware/localization-core-livewire": "^1.5.3",
+        "liberusoftware/localization-mymemory": "^1.5.1",
+        "liberusoftware/module-manager": "^1.9.2",
+        "liberusoftware/module-manager-filament": "^1.11.2",
         "liberusoftware/notifications": "^1.0",
         "liberusoftware/observability": "^1.0",
-        "liberusoftware/organizations-teams": "^1.0",
+        "liberusoftware/organizations-teams": "^1.10.3",
         "liberusoftware/organizations-teams-filament": "^1.0",
         "liberusoftware/profiles": "^1.0",
-        "liberusoftware/roles-permissions": "^1.0",
+        "liberusoftware/roles-permissions": "^1.7.2",
         "liberusoftware/roles-permissions-filament": "^1.0",
         "liberusoftware/scheduler-queues": "^1.0",
         "liberusoftware/search": "^1.0",
         "liberusoftware/search-api": "^1.0",
-        "liberusoftware/sessions-devices": "^1.0",
+        "liberusoftware/sessions-devices": "^1.5.2",
         "liberusoftware/sessions-devices-filament": "^1.1",
-        "liberusoftware/settings": "^1.0",
+        "liberusoftware/settings": "^1.5.3",
         "liberusoftware/settings-filament": "^1.0",
         "liberusoftware/tenancy": "^1.0.1",
         "liberusoftware/theme-base": "^2.0",
         "liberusoftware/theme-clear-signal": "^1.0",
         "liberusoftware/theme-dark": "^1.0",
         "liberusoftware/theme-default": "^1.0",
-        "liberusoftware/theme-support": "^1.0",
-        "liberusoftware/theme-support-livewire": "^1.1",
-        "liberusoftware/two-factor-authentication": "^1.0",
+        "liberusoftware/theme-support": "^1.8.4",
+        "liberusoftware/theme-support-livewire": "^1.6.2",
+        "liberusoftware/two-factor-authentication": "^1.4.7",
         "liberusoftware/users-roles": "^1.0",
         "liberusoftware/webhooks": "^1.0",
         "livewire/livewire": "^4.4.8",
@@ -126,7 +126,8 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "test": "vendor/bin/pest"
+        "test": "vendor/bin/pest",
+        "test:module-host": "@php tests/run-module-host.php"
     },
     "extra": {
         "laravel": {
@@ -148,5 +149,105 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-module-manager-filament.git",
+            "only": [
+                "liberusoftware/module-manager-filament"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-localization-mymemory.git",
+            "only": [
+                "liberusoftware/localization-mymemory"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-settings.git",
+            "only": [
+                "liberusoftware/settings"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-theme-support.git",
+            "only": [
+                "liberusoftware/theme-support"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-localization-core.git",
+            "only": [
+                "liberusoftware/localization-core"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-localization-core-livewire.git",
+            "only": [
+                "liberusoftware/localization-core-livewire"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-theme-support-livewire.git",
+            "only": [
+                "liberusoftware/theme-support-livewire"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-organizations-teams.git",
+            "only": [
+                "liberusoftware/organizations-teams"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-roles-permissions.git",
+            "only": [
+                "liberusoftware/roles-permissions"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations.git",
+            "only": [
+                "liberusoftware/integrations"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-module-manager.git",
+            "only": [
+                "liberusoftware/module-manager"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-sessions-devices.git",
+            "only": [
+                "liberusoftware/sessions-devices"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-two-factor-authentication.git",
+            "only": [
+                "liberusoftware/two-factor-authentication"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-identity-socialstream.git",
+            "only": [
+                "liberusoftware/identity-socialstream"
+            ]
+        }
+    ]
 }

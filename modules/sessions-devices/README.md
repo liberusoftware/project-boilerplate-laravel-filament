@@ -89,3 +89,7 @@ Focused issues and tested pull requests are welcome in the [GitHub repository](h
 ## Contributors
 
 Thank you to everyone who helps improve Liberu. [View the contributors graph](https://github.com/liberusoftware/module-sessions-devices/graphs/contributors).
+
+### Shared session schema
+
+The migration creates the standard session table only when the host has none. Existing host columns and session data are preserved. Rolling back this adapter retains the shared table and active sessions. Session listing and revocation remain restricted to the authenticated actor; current sessions are protected from individual revocation.

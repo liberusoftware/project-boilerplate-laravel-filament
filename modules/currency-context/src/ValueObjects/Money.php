@@ -33,7 +33,7 @@ final readonly class Money
             return (string) $this->minorAmount;
         }
         $negative = $this->minorAmount < 0;
-        $digits = str_pad((string) abs($this->minorAmount), $this->currency->minorUnits + 1, '0', STR_PAD_LEFT);
+        $digits = str_pad(ltrim((string) $this->minorAmount, '-'), $this->currency->minorUnits + 1, '0', STR_PAD_LEFT);
         $value = substr($digits, 0, -$this->currency->minorUnits).'.'.substr($digits, -$this->currency->minorUnits);
 
         return $negative ? '-'.$value : $value;

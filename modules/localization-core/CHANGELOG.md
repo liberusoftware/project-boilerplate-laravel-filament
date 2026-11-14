@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.1
+
+- Resolve optional user locale and timezone preferences safely for projected Eloquent users and other authenticatable users.
+- Cover locale precedence, RTL direction, formatting, middleware persistence, and translation registry contracts.
+- Enforce 100% source coverage and PHPStan level 5.
+
 ## 1.3.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

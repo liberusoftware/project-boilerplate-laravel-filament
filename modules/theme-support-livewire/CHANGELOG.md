@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2 - 2026-11-14
+
+- Reject redirect referers with lookalike or userinfo hostnames while preserving application paths, queries and fragments.
+- Test redirect boundaries through native Livewire update requests with full source coverage.
+
 ## 1.3.0 - 2026-08-06
 
 - Adopts the theme switcher tests, which needed installed themes and so could only run in a

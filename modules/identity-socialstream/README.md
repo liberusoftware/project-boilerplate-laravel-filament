@@ -94,3 +94,7 @@ Focused issues and tested pull requests are welcome in the [GitHub repository](h
 ## Contributors
 
 Thank you to everyone who helps improve Liberu. [View the contributors graph](https://github.com/liberusoftware/module-identity-socialstream/graphs/contributors).
+
+### Shared linked identities
+
+The connected-account migration preserves an existing host table and its custom columns. Rolling back the adapter retains linked identities and credentials. New users, connected accounts, and personal teams are created in one transaction; ownership is checked before connected-account updates.

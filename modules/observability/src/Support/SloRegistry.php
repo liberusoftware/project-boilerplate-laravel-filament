@@ -10,7 +10,7 @@ final class SloRegistry
 
     public function register(string $name, float $target, string $window): void
     {
-        if (isset($this->objectives[$name]) || $target <= 0 || $target > 1) {
+        if (isset($this->objectives[$name]) || ! is_finite($target) || $target <= 0 || $target > 1) {
             throw new InvalidArgumentException('Invalid or duplicate SLO.');
         }$this->objectives[$name] = compact('target', 'window');
     }

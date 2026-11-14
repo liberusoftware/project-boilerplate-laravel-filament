@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class TeamSubscription extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'team_id',
+        'stripe_id',
+        'stripe_status',
+        'stripe_price',
+        'plan_key',
+        'quantity',
+        'trial_ends_at',
+        'current_period_ends_at',
+        'ends_at',
+        'cancelled_at',
+    ];
+
+    protected $casts = [
+        'trial_ends_at' => 'datetime',
+        'current_period_ends_at' => 'datetime',
+        'ends_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+    ];
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function onTrial(): bool
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
+    public function hasExpired(): bool
+    {
+        return $this->ends_at && $this->ends_at->isPast();
+    }
+
+    public function isActive(): bool
+    {
+        return in_array($this->stripe_status, ['active', 'trialing'], true) && ! $this->hasExpired();
+    }
+
+    public function cancelAt(): bool
+    {
+        return $this->ends_at && $this->ends_at->isFuture();
+    }
+}

@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
 use Liberu\Foundation\Theme\Services\ThemeManager;
 
 if (! function_exists('theme')) {
@@ -61,13 +60,7 @@ if (! function_exists('set_theme')) {
      */
     function set_theme(string $themeName): void
     {
-        theme()->setTheme($themeName);
-
-        session(['theme_preference' => $themeName]);
-
-        if (($user = auth()->user()) instanceof Model) {
-            $user->update(['theme_preference' => $themeName]);
-        }
+        theme()->persistTheme($themeName);
     }
 }
 

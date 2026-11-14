@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.3 - 2026-11-14
+
+- Reject redirect referers with lookalike or userinfo hostnames while preserving application paths, queries and fragments.
+- Test redirect boundaries through native Livewire update requests with full source coverage.
+
 ## 1.3.1 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

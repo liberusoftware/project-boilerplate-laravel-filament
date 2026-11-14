@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.3 - 2026-11-14
+
+- Cover scoped settings priority, tenant and actor isolation, updates, encrypted secrets, validation and corrupt payload handling in the module native suite.
+- Require 100% source coverage in CI.
+
 ## 1.3.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

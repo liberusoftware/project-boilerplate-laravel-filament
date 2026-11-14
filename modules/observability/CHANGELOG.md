@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.8
+
+- Register correlation middleware after HTTP kernel resolution so both boot orders preserve request context and response identifiers.
+- Reject non-finite SLO targets.
+- Cover dashboard authorization, telemetry filtering, nested redaction, metrics bindings, and correlation propagation with a 100% source coverage gate.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

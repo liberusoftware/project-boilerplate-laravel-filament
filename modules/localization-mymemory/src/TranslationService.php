@@ -107,6 +107,9 @@ final class TranslationService implements TranslationProvider
         return self::SUPPORTED_LANGUAGES;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function supportedLanguages(): array
     {
         return $this->getSupportedLanguages();

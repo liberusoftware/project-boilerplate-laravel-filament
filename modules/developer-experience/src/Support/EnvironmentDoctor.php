@@ -4,7 +4,11 @@ namespace Liberu\Foundation\DeveloperExperience\Support;
 
 final class EnvironmentDoctor
 {
-    /** @return list<string> */
+    /**
+     * @param  list<string>  $extensions
+     * @param  list<string>  $writablePaths
+     * @return list<string>
+     */
     public function inspect(array $extensions, array $writablePaths): array
     {
         $errors = [];

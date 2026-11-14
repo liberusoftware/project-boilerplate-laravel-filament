@@ -19,7 +19,7 @@
       "name": "two-factor-authentication"
     }
   },
-  "version": "1.4.1",
+  "version": "1.4.7",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\TwoFactor\\Tests\\": "tests/"

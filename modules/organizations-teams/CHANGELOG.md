@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.3 - 2026-11-14
+
+- Discover tenant models from the running host application so team backups and imports retain model records when the package is linked or lives outside the host tree.
+- Preserve package-relative discovery before Laravel binds its base path.
+- Test concrete and inherited tenant models, duplicate paths, unscoped and abstract models, missing classes and invalid host bindings.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

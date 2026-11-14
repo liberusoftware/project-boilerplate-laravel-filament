@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1 - 2026-11-14
+
+- Test recursive translation batches, malformed cache entries and invalid API payloads.
+- Require 100% native source coverage in CI.
+
 ## 1.2.1 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

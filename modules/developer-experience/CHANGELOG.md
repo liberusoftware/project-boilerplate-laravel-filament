@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.14
+
+- Cover environment inspection and doctor command success and failure contracts at 100% source coverage.
+- Enforce full source coverage in CI.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

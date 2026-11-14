@@ -19,7 +19,7 @@
       "name": "activity-comments"
     }
   },
-  "version": "1.4.2",
+  "version": "1.4.15",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\ActivityComments\\Tests\\": "tests/"
@@ -30,7 +30,8 @@
     "pestphp/pest": "^5.3.3"
   },
   "scripts": {
-    "test": "pest"
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=100"
   },
   "config": {
     "allow-plugins": {

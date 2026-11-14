@@ -93,3 +93,7 @@ Focused issues and tested pull requests are welcome in the [GitHub repository](h
 ## Contributors
 
 Thank you to everyone who helps improve Liberu. [View the contributors graph](https://github.com/liberusoftware/module-theme-support/graphs/contributors).
+
+### Legacy preference values
+
+Hosts can map stored legacy values to installed theme names through `theme.preference_aliases`, for example `['legacy-default' => 'dark']`. The map applies to authenticated actors and sessions; unmapped values keep their existing meaning. Invalid targets fall through to the next preference source. The application stylesheet remains before the active theme stylesheet in `activeEntries()`.

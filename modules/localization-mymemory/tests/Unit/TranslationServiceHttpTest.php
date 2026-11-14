@@ -131,3 +131,40 @@ test('translation service returns supported languages', function () {
     expect($languages)->toHaveKey('fr');
     expect($languages)->toHaveKey('de');
 });
+
+it('preserves nested batch keys and non-string values while translating text', function () {
+    Cache::flush();
+    Http::preventStrayRequests();
+    Http::fake(['api.mymemory.translated.net/*' => Http::response([
+        'responseData' => ['translatedText' => 'Traduit'],
+    ])]);
+
+    $input = ['heading' => 'Hello', 'nested' => [5 => 'World', 'count' => 0, 'enabled' => false, 'unset' => null], 'empty' => []];
+
+    expect((new TranslationService())->translateBatch($input, 'fr'))->toBe([
+        'heading' => 'Traduit',
+        'nested' => [5 => 'Traduit', 'count' => 0, 'enabled' => false, 'unset' => null],
+        'empty' => [],
+    ]);
+    Http::assertSentCount(2);
+    Http::assertSent(fn ($request) => $request['q'] === 'Hello' && $request['langpair'] === 'en|fr');
+});
+
+it('returns the original text for a malformed cache entry without requesting the API', function () {
+    Cache::flush();
+    Http::preventStrayRequests();
+    Http::fake();
+    Cache::put('translation:en:es:'.md5('Hello'), ['unexpected' => true], 60);
+
+    expect((new TranslationService())->translate('Hello', 'es'))->toBe('Hello');
+    Http::assertNothingSent();
+});
+
+it('does not cache successful responses without a usable translation', function ($payload) {
+    Cache::flush();
+    Http::preventStrayRequests();
+    Http::fake(['api.mymemory.translated.net/*' => Http::response($payload)]);
+
+    expect((new TranslationService())->translate('Hello', 'es'))->toBe('Hello')
+        ->and(Cache::has('translation:en:es:'.md5('Hello')))->toBeFalse();
+})->with(['missing' => [[]], 'empty' => [['responseData' => ['translatedText' => '']]], 'invalid type' => [['responseData' => ['translatedText' => 42]]]]);

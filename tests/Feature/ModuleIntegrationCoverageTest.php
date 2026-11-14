@@ -339,7 +339,7 @@ it('runs module theme and foundation operational commands', function () {
 
 it('invites accepts resolves and transfers team membership', function () {
     $owner = User::factory()->create();
-    $member = User::factory()->create();
+    $member = User::factory()->create(['email' => 'member@example.test']);
     $team = Team::forceCreate(['user_id' => $owner->id, 'name' => 'Coverage', 'personal_team' => false, 'status' => 'active']);
     $token = (new InviteMember())->handle($team->id, ' MEMBER@EXAMPLE.TEST ', 'member', $owner->id);
     (new AcceptInvitation())->handle($token, $member, 'member@example.test');
