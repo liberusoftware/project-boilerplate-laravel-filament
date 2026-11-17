@@ -11,5 +11,5 @@ permissions:
 jobs:
   publish:
     if: github.repository_owner == 'liberusoftware' && !github.event.repository.private
-    uses: liberusoftware/project-cms-laravel-filament/.github/workflows/publish-composer-application.yml@4804449763b5c8dfd164537060d36b4a88bca817
+    uses: liberusoftware/project-cms-laravel-filament/.github/workflows/publish-composer-application.yml@1b49165dcf85b271b50986eba5b6af23ba3fbacb
     secrets: inherit
