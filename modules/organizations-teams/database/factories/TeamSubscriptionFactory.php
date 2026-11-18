@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Team;
-use App\Models\TeamSubscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Models\TeamSubscription;
 
 class TeamSubscriptionFactory extends Factory
 {

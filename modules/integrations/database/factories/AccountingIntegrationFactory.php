@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\AccountingIntegration;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Liberu\Foundation\Integrations\Models\AccountingIntegration;
 
 class AccountingIntegrationFactory extends Factory
 {

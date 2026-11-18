@@ -39,8 +39,8 @@ it('renders the tenant-scoped Shield RoleResource without a 500', function () {
     $owner->forceFill(['current_team_id' => $team->id])->save();
 
     setPermissionsTeamId($team->id);
-    $owner->assignRole(Role::create(['name' => 'super_admin', 'guard_name' => 'web']));
-    $editor = Role::create(['name' => 'editor', 'guard_name' => 'web']);
+    $owner->assignRole(Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']));
+    $editor = Role::firstOrCreate(['name' => 'editor', 'guard_name' => 'web']);
 
     // Default shield config gates access via permissions, not a gate bypass; authorise
     // for this render so the tenant-scoped table query actually executes.

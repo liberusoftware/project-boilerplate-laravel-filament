@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\WhatsAppNumber;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Liberu\Foundation\Integrations\Models\WhatsAppNumber;
 
 class WhatsAppNumberFactory extends Factory
 {

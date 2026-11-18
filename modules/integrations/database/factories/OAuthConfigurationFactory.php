@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\OAuthConfiguration;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Liberu\Foundation\Integrations\Models\OAuthConfiguration;
 
 class OAuthConfigurationFactory extends Factory
 {

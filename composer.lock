@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "af4ac0c6516a953cf59984488a67c7d3",
+    "content-hash": "1a60ee020eb2805d7040841041e3b8fc",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5637,6 +5637,77 @@
             "time": "2026-11-13T21:59:03+00:00"
         },
         {
+            "name": "liberusoftware/affiliate-contracts",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/affiliate-contracts.git",
+                "reference": "931f27a9dfa2369c2457850b53ff50c7e20a4ae0"
+            },
+            "require": {
+                "illuminate/support": "^13.0",
+                "php": "^8.5"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "affiliate-contracts"
+                },
+                "laravel": {
+                    "providers": [
+                        "Liberu\\Affiliate\\Contracts\\AffiliateContractsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Affiliate\\Contracts\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Product-neutral affiliate management and referral attribution contracts and DTOs for Liberu.",
+            "time": "2026-11-18T14:45:58+00:00"
+        },
+        {
+            "name": "liberusoftware/affiliate-core",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/affiliate-core.git",
+                "reference": "79a9ff6458b8948fbb216e870c9f2b81c36e4f4e"
+            },
+            "require": {
+                "illuminate/database": "^13.0",
+                "illuminate/events": "^13.0",
+                "illuminate/support": "^13.0",
+                "liberusoftware/affiliate-contracts": "^1.0",
+                "php": "^8.5"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "affiliate-core"
+                },
+                "laravel": {
+                    "providers": [
+                        "Liberu\\Affiliate\\Core\\AffiliateCoreServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Affiliate\\Core\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Reusable affiliate program, referral attribution, commission ledger, clawback, and payout engine extending liberusoftware/affiliate-contracts.",
+            "time": "2026-11-18T14:46:16+00:00"
+        },
+        {
             "name": "liberusoftware/analytics-contracts",
             "version": "1.0.3",
             "source": {
@@ -6908,6 +6979,42 @@
                 "source": "https://github.com/liberusoftware/module-organizations-teams-filament/tree/v1.6.1"
             },
             "time": "2026-11-02T16:50:09+00:00"
+        },
+        {
+            "name": "liberusoftware/passkeys",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/passkeys.git",
+                "reference": "42a9239f450dd44247e960c37629c0931e22ec93"
+            },
+            "require": {
+                "illuminate/contracts": "^13.0",
+                "illuminate/database": "^13.0",
+                "illuminate/support": "^13.0",
+                "php": "^8.5"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "passkeys"
+                },
+                "laravel": {
+                    "providers": [
+                        "Liberu\\Passkeys\\PasskeysServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Passkeys\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "WebAuthn / FIDO2 passkey registration, discoverable passwordless sign-in, step-up authentication, and clone detection for Liberu.",
+            "time": "2026-11-18T14:45:45+00:00"
         },
         {
             "name": "liberusoftware/profiles",

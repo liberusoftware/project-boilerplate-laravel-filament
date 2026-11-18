@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Teams;
 
-use App\Jobs\GenerateTeamBackup;
 use App\Models\Contact;
-use App\Models\Team;
-use App\Models\TeamBackup;
-use App\Services\TeamBackupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Liberu\Foundation\Organizations\Jobs\GenerateTeamBackup;
+use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Models\TeamBackup;
+use Liberu\Foundation\Organizations\Services\TeamBackupService;
 use RuntimeException;
 use Tests\TestCase;
 use Throwable;

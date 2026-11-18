@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Queue;
 
-use App\Jobs\Concerns\TenantAware;
-use App\Support\TenantContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Liberu\Foundation\Organizations\Support\TenantContext;
+use Liberu\Foundation\SchedulerQueues\Jobs\Concerns\TenantAware;
 use Tests\TestCase;
 
 /**

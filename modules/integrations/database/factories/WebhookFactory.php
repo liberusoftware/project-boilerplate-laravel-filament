@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Team;
-use App\Models\Webhook;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Liberu\Foundation\Integrations\Models\Webhook;
+use Liberu\Foundation\Organizations\Models\Team;
 
 class WebhookFactory extends Factory
 {

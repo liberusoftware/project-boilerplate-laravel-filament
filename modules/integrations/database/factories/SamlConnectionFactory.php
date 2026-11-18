@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\SamlConnection;
-use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Liberu\Foundation\Integrations\Models\SamlConnection;
+use Liberu\Foundation\Organizations\Models\Team;
 
 class SamlConnectionFactory extends Factory
 {

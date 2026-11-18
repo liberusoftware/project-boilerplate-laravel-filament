@@ -48,6 +48,7 @@ The trusted `liberusoftware/composer-installer` places it in `/modules/settings-
 ### Public contracts
 
 - No separate contract type is declared; use the documented provider and capability boundary.
+- View surface: `ManageSiteSettings` renders through Filament's settings page schema and exposes no standalone custom Blade template (`THEMES.md` §5).
 
 ### Commands
 

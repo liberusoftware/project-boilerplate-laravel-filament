@@ -46,6 +46,7 @@ The trusted `liberusoftware/composer-installer` places it in `/modules/sessions-
 ### Public contracts
 
 - No separate contract type is declared; use the documented provider and capability boundary.
+- Default view namespace: `sessions-devices-filament` (`sessions-devices-filament::pages.account-security`), overridable by themes under `resources/views/modules/sessions-devices-filament/pages/account-security.blade.php`.
 
 ### Commands
 

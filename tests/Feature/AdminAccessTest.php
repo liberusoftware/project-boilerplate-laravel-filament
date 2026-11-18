@@ -20,7 +20,7 @@ it('treats a super_admin (in any team) as an admin regardless of team context', 
     $team = Team::factory()->create(['user_id' => $user->id]);
 
     setPermissionsTeamId($team->id);
-    $role = Role::create(['name' => 'super_admin']);
+    $role = Role::firstOrCreate(['name' => 'super_admin']);
     $user->assignRole($role);
 
     // Leave the team context — the gate runs on plain web requests with no active team.

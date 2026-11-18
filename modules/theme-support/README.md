@@ -97,3 +97,14 @@ Thank you to everyone who helps improve Liberu. [View the contributors graph](ht
 ### Legacy preference values
 
 Hosts can map stored legacy values to installed theme names through `theme.preference_aliases`, for example `['legacy-default' => 'dark']`. The map applies to authenticated actors and sessions; unmapped values keep their existing meaning. Invalid targets fall through to the next preference source. The application stylesheet remains before the active theme stylesheet in `activeEntries()`.
+
+### View resolution chain and module default overrides
+
+`ThemeManager::registerThemePaths()` enforces the `THEMES.md` §5 resolution chain across both un-namespaced views and module-namespaced views (`<namespace>::<view>`):
+
+1. Configured surface / tenant / site active theme (`resources/views/modules/<namespace>/...` or `resources/views/vendor/<namespace>/...`)
+2. Parent theme chain in inheritance order
+3. Packaged module default view registered via `loadViewsFrom(..., '<namespace>')`
+4. Application fallback (`resources/views/...`)
+
+`ThemeManager::describeViewSource(string $view)` returns diagnostic resolution metadata (`view`, `source`, `theme`, `namespace`) without exposing private filesystem paths.

@@ -53,6 +53,7 @@ The trusted `liberusoftware/composer-installer` places it in `/modules/organizat
 ### Public contracts
 
 - `src/Contracts/OrganizationActor.php`
+- View surface: this package is a presentation-neutral domain core and ships no Blade templates (`THEMES.md` §5); server-rendered presentation belongs in matching `-livewire` / `-filament` adapter packages.
 
 ### Commands
 

@@ -6,9 +6,9 @@ namespace Tests\Feature\Console;
 
 use App\Events\TaskOverdue;
 use App\Models\Task;
-use App\Models\Team;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Liberu\Foundation\Organizations\Models\Team;
 use Tests\TestCase;
 
 class NotifyOverdueTasksTest extends TestCase

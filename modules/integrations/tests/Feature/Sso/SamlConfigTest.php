@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Sso;
 
-use App\Filament\App\Resources\SamlConnectionResource;
-use App\Filament\App\Resources\SamlConnectionResource\Pages\CreateSamlConnection;
-use App\Filament\App\Resources\SamlConnectionResource\Pages\ListSamlConnections;
-use App\Models\SamlConnection;
-use App\Models\Team;
 use App\Models\User;
 use Database\Seeders\RolesSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Liberu\Foundation\Integrations\Filament\App\Resources\SamlConnectionResource;
+use Liberu\Foundation\Integrations\Filament\App\Resources\SamlConnectionResource\Pages\CreateSamlConnection;
+use Liberu\Foundation\Integrations\Filament\App\Resources\SamlConnectionResource\Pages\ListSamlConnections;
+use Liberu\Foundation\Integrations\Models\SamlConnection;
+use Liberu\Foundation\Organizations\Models\Team;
 use Livewire\Livewire;
 use Tests\TestCase;
 

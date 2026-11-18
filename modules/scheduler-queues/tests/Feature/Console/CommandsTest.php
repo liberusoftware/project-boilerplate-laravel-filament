@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Console;
 
-use App\Models\OAuthConfiguration;
 use App\Models\SocialMediaPost;
 use App\Models\Task;
 use App\Models\User;
 use App\Notifications\TaskReminderNotification;
-use App\Services\FacebookService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use Liberu\Foundation\Integrations\Models\OAuthConfiguration;
+use Liberu\Foundation\Integrations\Services\FacebookService;
 use Tests\TestCase;
 
 class CommandsTest extends TestCase

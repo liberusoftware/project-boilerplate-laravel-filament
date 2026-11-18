@@ -263,3 +263,87 @@ it('ignores malformed alias configuration and empty preference values', function
 
     expect(Blade::render('{{ $activeTheme }}'))->toBe('default');
 });
+
+it('resolves module default views child and parent theme overrides and application fallback with diagnostic metadata', function () {
+    $parentManifest = writeCoverageTheme(['name' => 'parent-theme', 'required_capabilities' => []]);
+    $childManifest = writeCoverageTheme(['name' => 'child-theme', 'parent' => 'parent-theme', 'required_capabilities' => []]);
+    $emptyManifest = writeCoverageTheme(['name' => 'empty-theme', 'required_capabilities' => []]);
+    $parentDir = dirname($parentManifest);
+    $childDir = dirname($childManifest);
+    $emptyDir = dirname($emptyManifest);
+    $moduleViews = sys_get_temp_dir().'/module-views-'.bin2hex(random_bytes(5));
+    $appViews = sys_get_temp_dir().'/app-views-'.bin2hex(random_bytes(5));
+    mkdir($parentDir.'/resources/views/modules/catalog', 0777, true);
+    mkdir($childDir.'/resources/views/modules/catalog', 0777, true);
+    mkdir($emptyDir.'/resources/views', 0777, true);
+    mkdir($moduleViews, 0777, true);
+    mkdir($appViews, 0777, true);
+    file_put_contents($moduleViews.'/card.blade.php', 'module-default-card');
+    file_put_contents($moduleViews.'/summary.blade.php', 'module-default-summary');
+    file_put_contents($parentDir.'/resources/views/modules/catalog/card.blade.php', 'parent-override-card');
+    file_put_contents($parentDir.'/resources/views/modules/catalog/summary.blade.php', 'parent-override-summary');
+    file_put_contents($childDir.'/resources/views/modules/catalog/card.blade.php', 'child-override-card');
+    file_put_contents($appViews.'/fallback-only.blade.php', 'application-fallback');
+
+    $cache = sys_get_temp_dir().'/theme-chain-cache-'.bin2hex(random_bytes(5));
+    (new ThemeCache())->write([
+        'parent-theme' => ThemeManifest::fromFile($parentManifest),
+        'child-theme' => ThemeManifest::fromFile($childManifest),
+        'empty-theme' => ThemeManifest::fromFile($emptyManifest),
+    ], $cache);
+    array_push($this->themeContractPaths, $parentDir, $childDir, $emptyDir, $moduleViews, $appViews, $cache);
+
+    View::addLocation($appViews);
+    View::addNamespace('catalog', $moduleViews);
+    config([
+        'theme.cache' => true,
+        'theme.cache_path' => $cache,
+        'theme.default' => 'empty-theme',
+        'theme.fallback' => 'empty-theme',
+        'theme.tenants.acme.storefront' => 'child-theme',
+        'theme.tenants.globex.storefront' => 'parent-theme',
+    ]);
+    $manager = new ThemeManager();
+    app()->instance(ThemeManager::class, $manager);
+
+    // 1. Empty theme resolves packaged module default view
+    $manager->setTheme('empty-theme');
+    expect(View::make('catalog::card')->render())->toBe('module-default-card')
+        ->and($manager->describeViewSource('catalog::card'))->toBe([
+            'view' => 'catalog::card',
+            'source' => 'module',
+            'theme' => null,
+            'namespace' => 'catalog',
+        ]);
+
+    // 2. Child theme override wins over parent and module default; parent wins when child does not override
+    $manager->selectForSurface('storefront', tenant: 'acme');
+    expect(View::make('catalog::card')->render())->toBe('child-override-card')
+        ->and($manager->describeViewSource('catalog::card'))->toBe([
+            'view' => 'catalog::card',
+            'source' => 'theme',
+            'theme' => 'child-theme',
+            'namespace' => 'catalog',
+        ])
+        ->and(View::make('catalog::summary')->render())->toBe('parent-override-summary')
+        ->and($manager->describeViewSource('catalog::summary'))->toBe([
+            'view' => 'catalog::summary',
+            'source' => 'theme',
+            'theme' => 'parent-theme',
+            'namespace' => 'catalog',
+        ]);
+
+    // 3. Tenant/surface isolation switches active overrides cleanly
+    $manager->selectForSurface('storefront', tenant: 'globex');
+    expect(View::make('catalog::card')->render())->toBe('parent-override-card')
+        ->and($manager->describeViewSource('catalog::card')['theme'])->toBe('parent-theme');
+
+    // 4. Missing theme view reaches application fallback
+    expect(View::make('fallback-only')->render())->toBe('application-fallback')
+        ->and($manager->describeViewSource('fallback-only'))->toBe([
+            'view' => 'fallback-only',
+            'source' => 'application',
+            'theme' => null,
+            'namespace' => null,
+        ]);
+});

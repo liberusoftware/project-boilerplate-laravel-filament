@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Teams;
 
-use App\Jobs\GenerateTeamBackup;
-use App\Models\Team;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
+use Liberu\Foundation\Organizations\Jobs\GenerateTeamBackup;
+use Liberu\Foundation\Organizations\Models\Team;
 use Tests\TestCase;
 
 class BackupTeamCommandTest extends TestCase

@@ -40,13 +40,14 @@ class ThemeServiceProvider extends ServiceProvider
 
         $this->registerBladeDirectives();
 
-        View::composer('*', function (ViewContract $view) use ($themeManager): void {
+        View::composer('*', function (ViewContract $view): void {
             // ponytail: re-derive per view render, not just once at boot. ThemeManager
             // is a singleton resolved once per app lifecycle (long-lived under Octane;
             // reused across a whole test method under Pest) — without this, an
             // admin-changed site theme (or session/user pref set mid-lifecycle) would
             // never be picked up until the process restarts. getSiteTheme() is a cheap
             // in-memory settings read, so re-running this per view is negligible.
+            $themeManager = $this->app->make(ThemeManager::class);
             $themeManager->setTheme($this->determineActiveTheme());
 
             $view->with('activeTheme', $themeManager->getActiveTheme());
@@ -72,6 +73,10 @@ class ThemeServiceProvider extends ServiceProvider
         $session = $this->resolvePreference(session('theme_preference'), $themeManager);
         if ($session !== null) {
             return $session;
+        }
+
+        if ($themeManager->getSelectedTheme() !== null) {
+            return $themeManager->getSelectedTheme();
         }
 
         // Admin-selected site-wide theme (validated; safe fallback to config default).

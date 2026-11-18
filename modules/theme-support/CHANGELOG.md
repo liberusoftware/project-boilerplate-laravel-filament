@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.5 - 2026-11-18
+
+- Resolve active theme and parent theme view namespace overrides (`resources/views/modules/{namespace}` and `resources/views/vendor/{namespace}`) ahead of packaged module default views per `THEMES.md` §5.
+- Preserve surface and tenant theme selection (`selectForSurface()`) across view renders and flush the view finder cache on theme changes.
+- Add `ThemeManager::describeViewSource()` to report view resolution origin (`theme`, `module`, `application`) without exposing filesystem paths.
+
 ## 1.8.4 - 2026-11-14
 
 - Retain the application CSS bundle before theme assets so shared Tailwind styles remain available.

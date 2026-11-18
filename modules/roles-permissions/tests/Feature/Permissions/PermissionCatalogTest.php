@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Permissions;
 
 use App\Models\User;
-use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
+use Liberu\Foundation\RolesPermissions\Support\PermissionCatalog;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Tests\TestCase;

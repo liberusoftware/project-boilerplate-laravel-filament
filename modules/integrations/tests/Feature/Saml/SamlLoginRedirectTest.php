@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Saml;
 
-use App\Models\SamlConnection;
-use App\Models\Team;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Liberu\Foundation\Integrations\Models\SamlConnection;
+use Liberu\Foundation\Organizations\Models\Team;
 use Tests\TestCase;
 
 class SamlLoginRedirectTest extends TestCase

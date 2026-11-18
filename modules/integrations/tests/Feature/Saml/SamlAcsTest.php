@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Saml;
 
-use App\Models\SamlConnection;
-use App\Models\Team;
 use App\Models\User;
 use DOMDocument;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Liberu\Foundation\Integrations\Models\SamlConnection;
+use Liberu\Foundation\Organizations\Models\Team;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use Tests\TestCase;

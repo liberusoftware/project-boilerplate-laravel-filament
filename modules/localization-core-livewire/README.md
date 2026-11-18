@@ -46,6 +46,7 @@ The trusted `liberusoftware/composer-installer` places it in `/modules/localizat
 ### Public contracts
 
 - No separate contract type is declared; use the documented provider and capability boundary.
+- Default view namespace: `localization-livewire` (`localization-livewire::livewire.language-switcher`), overridable by themes under `resources/views/modules/localization-livewire/livewire/language-switcher.blade.php`.
 
 ### Commands
 

@@ -19,6 +19,8 @@ final class ThemeManager
 {
     protected string $activeTheme;
 
+    protected ?string $selectedTheme = null;
+
     /** @var array<string, ThemeManifest> */
     protected array $themes = [];
 
@@ -84,8 +86,14 @@ final class ThemeManager
             ?? config("theme.surfaces.{$surface}")
             ?? config('theme.default', 'default');
         $this->setTheme(is_string($selected) ? $selected : 'default');
+        $this->selectedTheme = $this->activeTheme;
 
         return $this->activeTheme;
+    }
+
+    public function getSelectedTheme(): ?string
+    {
+        return $this->selectedTheme;
     }
 
     public function getActiveTheme(): string
@@ -182,13 +190,64 @@ final class ThemeManager
         $themeRoots = array_map(fn (string $name) => realpath($this->getThemeViewsPath($name)) ?: $this->getThemeViewsPath($name), array_keys($this->themes));
         $paths = array_values(array_diff($finder->getPaths(), $themeRoots));
         $chain = array_reverse($this->inheritanceChain());
+        $activeRoots = [];
         foreach ($chain as $name) {
             $path = realpath($this->getThemeViewsPath($name)) ?: $this->getThemeViewsPath($name);
             if (File::isDirectory($path)) {
                 array_unshift($paths, $path);
+                array_unshift($activeRoots, $path);
             }
         }
         $finder->setPaths(array_values(array_unique($paths)));
+        $this->registerThemeNamespaceOverrides($finder, $themeRoots, $activeRoots);
+        $finder->flush();
+    }
+
+    /**
+     * @param  list<string>  $themeRoots
+     * @param  list<string>  $activeRoots
+     */
+    private function registerThemeNamespaceOverrides(FileViewFinder $finder, array $themeRoots, array $activeRoots): void
+    {
+        foreach ($finder->getHints() as $namespace => $hints) {
+            $allOverrides = [];
+            foreach ($themeRoots as $root) {
+                foreach (["{$root}/modules/{$namespace}", "{$root}/vendor/{$namespace}"] as $candidate) {
+                    $allOverrides[] = realpath($candidate) ?: $candidate;
+                }
+            }
+            $baseHints = array_values(array_diff($hints, $allOverrides));
+            $activeOverrides = [];
+            foreach ($activeRoots as $root) {
+                foreach (["{$root}/modules/{$namespace}", "{$root}/vendor/{$namespace}"] as $candidate) {
+                    $resolved = realpath($candidate) ?: $candidate;
+                    if (File::isDirectory($resolved)) {
+                        $activeOverrides[] = $resolved;
+                    }
+                }
+            }
+            $finder->replaceNamespace($namespace, array_values(array_unique([...$activeOverrides, ...$baseHints])));
+        }
+    }
+
+    /**
+     * Resolve the diagnostic origin of a view without exposing private filesystem paths.
+     *
+     * @return array{view: string, source: string, theme: string|null, namespace: string|null}
+     */
+    public function describeViewSource(string $view): array
+    {
+        $finder = View::getFinder();
+        $resolved = realpath($finder->find($view)) ?: $finder->find($view);
+        $namespace = str_contains($view, '::') ? explode('::', $view, 2)[0] : null;
+        foreach ($this->inheritanceChain() as $theme) {
+            $root = realpath($this->getThemeViewsPath($theme)) ?: $this->getThemeViewsPath($theme);
+            if ($resolved === $root || str_starts_with($resolved, $root.'/')) {
+                return ['view' => $view, 'source' => 'theme', 'theme' => $theme, 'namespace' => $namespace];
+            }
+        }
+
+        return ['view' => $view, 'source' => $namespace !== null ? 'module' : 'application', 'theme' => null, 'namespace' => $namespace];
     }
 
     public function getThemeCss(?string $theme = null): ?string

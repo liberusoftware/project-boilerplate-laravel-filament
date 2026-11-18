@@ -47,6 +47,7 @@ The trusted `liberusoftware/composer-installer` places it in `/modules/roles-per
 ### Public contracts
 
 - No separate contract type is declared; use the documented provider and capability boundary.
+- View surface: role and permission administration delegates to Filament Shield and standard Filament resource views and exposes no standalone custom Blade template (`THEMES.md` §5).
 
 ### Commands
 

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Support\PermissionCatalog;
 use Illuminate\Database\Migrations\Migration;
+use Liberu\Foundation\RolesPermissions\Support\PermissionCatalog;
 
 /**
  * No-lockout seed for F4 role enforcement: mints the permission catalog and

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Teams;
 
-use App\Exceptions\TeamNotEmptyException;
-use App\Exceptions\TeamRestoreException;
 use App\Models\Contact;
 use App\Models\Lead;
 use App\Models\Task;
-use App\Models\Team;
-use App\Models\TeamBackup;
-use App\Services\TeamBackupService;
-use App\Services\TeamRestoreService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Liberu\Foundation\Organizations\Exceptions\TeamNotEmptyException;
+use Liberu\Foundation\Organizations\Exceptions\TeamRestoreException;
+use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Models\TeamBackup;
+use Liberu\Foundation\Organizations\Services\TeamBackupService;
+use Liberu\Foundation\Organizations\Services\TeamRestoreService;
 use Tests\TestCase;
 use Throwable;
 use ZipArchive;

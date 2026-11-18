@@ -46,7 +46,7 @@ return [
          *     Jetstream's `teams()` wins and Spatie's is never compiled in.
          *   - the `team()` / `withoutTeam()` query scopes — unused here.
          *
-         * Pointing it at `App\Models\Team` would therefore change no behaviour,
+         * Pointing it at `Liberu\Foundation\Organizations\Models\Team` would therefore change no behaviour,
          * and it invites re-exposing Spatie's `teams()` relation, which would
          * collide with Jetstream's. Leave it null.
          */

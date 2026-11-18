@@ -11,6 +11,7 @@
     "laravel": "^13.0",
     "packages": {
       "liberusoftware/module-manager": "^1.0",
+      "liberusoftware/roles-permissions": "^1.0",
       "liberusoftware/tenancy": "^1.0"
     }
   },

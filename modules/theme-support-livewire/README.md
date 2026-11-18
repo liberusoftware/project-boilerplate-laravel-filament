@@ -46,6 +46,7 @@ The trusted `liberusoftware/composer-installer` places it in `/modules/theme-sup
 ### Public contracts
 
 - No separate contract type is declared; use the documented provider and capability boundary.
+- Default view namespace: `theme-support-livewire` (`theme-support-livewire::livewire.theme-switcher`), overridable by themes under `resources/views/modules/theme-support-livewire/livewire/theme-switcher.blade.php`.
 
 ### Commands
 

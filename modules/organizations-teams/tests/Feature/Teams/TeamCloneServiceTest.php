@@ -9,11 +9,11 @@ use App\Models\Menu;
 use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\Tag;
-use App\Models\Team;
 use App\Models\User;
-use App\Services\TeamCloneService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Services\TeamCloneService;
 use Tests\TestCase;
 
 class TeamCloneServiceTest extends TestCase

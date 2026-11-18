@@ -8,12 +8,12 @@ use App\Models\CampaignRecipient;
 use App\Models\Contact;
 use App\Models\Lead;
 use App\Models\MarketingCampaign;
-use App\Models\Team;
-use App\Services\MailChimpService;
-use App\Services\TwilioService;
-use App\Services\WhatsAppBusinessService;
-use App\Support\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Liberu\Foundation\Integrations\Services\MailChimpService;
+use Liberu\Foundation\Integrations\Services\TwilioService;
+use Liberu\Foundation\Integrations\Services\WhatsAppBusinessService;
+use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Support\TenantContext;
 use Mockery;
 use Tests\TestCase;
 

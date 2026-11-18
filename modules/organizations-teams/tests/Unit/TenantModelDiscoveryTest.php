@@ -3,10 +3,10 @@
 use App\Models\DiscoveryInherited;
 use App\Models\DiscoveryScopedAlpha;
 use App\Models\DiscoveryScopedZeta;
-use App\Support\TenantModels;
-use App\Traits\IsTenantModel;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Liberu\Foundation\Organizations\Support\TenantModels;
+use Liberu\Foundation\Organizations\Traits\IsTenantModel;
 
 require_once dirname(__DIR__, 2).'/src/Legacy/Support/TenantModels.php';
 
@@ -27,10 +27,10 @@ beforeEach(function () {
         file_put_contents($this->discoveryRoot.'/FixtureModels.php', <<<'FIXTURES'
 <?php
 namespace App\Models;
-class DiscoveryScopedAlpha extends \Illuminate\Database\Eloquent\Model { use \App\Traits\IsTenantModel; }
-class DiscoveryScopedZeta extends \Illuminate\Database\Eloquent\Model { use \App\Traits\IsTenantModel; }
+class DiscoveryScopedAlpha extends \Illuminate\Database\Eloquent\Model { use \Liberu\Foundation\Organizations\Traits\IsTenantModel; }
+class DiscoveryScopedZeta extends \Illuminate\Database\Eloquent\Model { use \Liberu\Foundation\Organizations\Traits\IsTenantModel; }
 class DiscoveryUnscoped extends \Illuminate\Database\Eloquent\Model {}
-abstract class DiscoveryAbstract extends \Illuminate\Database\Eloquent\Model { use \App\Traits\IsTenantModel; }
+abstract class DiscoveryAbstract extends \Illuminate\Database\Eloquent\Model { use \Liberu\Foundation\Organizations\Traits\IsTenantModel; }
 class DiscoveryInherited extends DiscoveryAbstract {}
 FIXTURES);
         require $this->discoveryRoot.'/FixtureModels.php';

@@ -24,6 +24,8 @@
         "laravel/socialite": "^5.31.0",
         "laravel/tinker": "^3.0.2",
         "liberusoftware/activity-comments": "^1.0",
+        "liberusoftware/affiliate-contracts": "^1.0",
+        "liberusoftware/affiliate-core": "^1.0",
         "liberusoftware/analytics-contracts": "^1.0",
         "liberusoftware/analytics-core": "^1.0",
         "liberusoftware/analytics-google": "^1.0",
@@ -52,6 +54,7 @@
         "liberusoftware/observability": "^1.0",
         "liberusoftware/organizations-teams": "^1.10.3",
         "liberusoftware/organizations-teams-filament": "^1.0",
+        "liberusoftware/passkeys": "^1.0",
         "liberusoftware/profiles": "^1.0",
         "liberusoftware/roles-permissions": "^1.7.2",
         "liberusoftware/roles-permissions-filament": "^1.0",
@@ -247,6 +250,27 @@
             "url": "https://github.com/liberusoftware/module-identity-socialstream.git",
             "only": [
                 "liberusoftware/identity-socialstream"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/affiliate-contracts.git",
+            "only": [
+                "liberusoftware/affiliate-contracts"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/affiliate-core.git",
+            "only": [
+                "liberusoftware/affiliate-core"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/passkeys.git",
+            "only": [
+                "liberusoftware/passkeys"
             ]
         }
     ]

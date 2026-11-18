@@ -25,6 +25,7 @@ it('lets a super_admin view resources even with no permissions generated', funct
     $user->unsetRelation('roles');
 
     // No permissions exist (shield:generate not run); visibility must come from the gate.
+    Permission::query()->delete();
     expect(Permission::count())->toBe(0);
     expect($user->can('viewAny', User::class))->toBeTrue();
 });
