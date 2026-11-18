@@ -31,7 +31,7 @@
         "liberusoftware/analytics-google": "^1.0",
         "liberusoftware/analytics-meta": "^1.0",
         "liberusoftware/api-access": "^1.0",
-        "liberusoftware/application": "^1.0",
+        "liberusoftware/application": "^2.0",
         "liberusoftware/audit": "^1.0",
         "liberusoftware/composer-installer": "^1.1",
         "liberusoftware/currency-context": "^1.0",
