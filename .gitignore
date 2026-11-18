@@ -60,3 +60,6 @@ docs/superpowers
 # Installed from Packagist, not carried here.
 /modules/module-manager/
 /modules/module-manager-filament/
+/modules/affiliate-contracts/
+/modules/affiliate-core/
+/modules/passkeys/
