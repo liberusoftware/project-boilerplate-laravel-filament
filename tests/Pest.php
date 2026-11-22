@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/Stubs/LegacyHostStubs.php';
+require_once __DIR__.'/Stubs/HostStubs.php';
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

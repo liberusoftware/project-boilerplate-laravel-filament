@@ -19,7 +19,7 @@
       "name": "application"
     }
   },
-  "version": "1.10.1",
+  "version": "2.0.3",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\ApplicationCore\\Tests\\": "tests/"

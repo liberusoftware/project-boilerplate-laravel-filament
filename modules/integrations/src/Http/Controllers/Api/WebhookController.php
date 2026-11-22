@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Liberu\Foundation\Integrations\Exceptions\SsoException;
+use InvalidArgumentException;
 use Liberu\Foundation\Integrations\Models\Webhook;
 use Liberu\Foundation\Integrations\Services\WebhookService;
 use Liberu\Foundation\Integrations\Support\SsrfGuard;
@@ -83,7 +83,7 @@ class WebhookController extends Controller
         if (app()->isProduction() && isset($data['url'])) {
             try {
                 SsrfGuard::assertPublicHttps($data['url']);
-            } catch (SsoException) {
+            } catch (InvalidArgumentException) {
                 throw ValidationException::withMessages(['url' => 'A public HTTPS webhook URL is required.']);
             }
         }

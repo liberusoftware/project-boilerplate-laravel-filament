@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a6fc166be644726d4e71abd84cc62ccf",
+    "content-hash": "e8b489ce3a4fc8c12d16f973262a3b69",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6478,6 +6478,527 @@
             ],
             "description": "Provider adapter registry and protected connection lifecycle.",
             "time": "2026-11-14T15:23:44+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-google",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-google.git",
+                "reference": "540a36a3db7b417ee299a87118f8d6ddb37a896a"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-google"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Google\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Google\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Google Ads, Google Calendar, Gmail, and YouTube integration services.",
+            "time": "2026-11-18T15:16:17+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-imap-pop3",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-imap-pop3.git",
+                "reference": "f7a31489019e342000d302a885ad6813b37816a6"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-imap-pop3"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\ImapPop3\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\ImapPop3\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "IMAP and POP3 email integration services.",
+            "time": "2026-11-18T15:17:27+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-linkedin",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-linkedin.git",
+                "reference": "e19eda5d93cf2613caff34e62182ca4e6bc6af54"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-linkedin"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\LinkedIn\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\LinkedIn\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "LinkedIn organic and LinkedIn Ads integration services.",
+            "time": "2026-11-18T15:16:55+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-mailchimp",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-mailchimp.git",
+                "reference": "35e6978639f4b70a52d72989a29739488adbf24e"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-mailchimp"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\MailChimp\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\MailChimp\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "MailChimp marketing integration service.",
+            "time": "2026-11-18T15:17:17+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-meta",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-meta.git",
+                "reference": "6b9cb065029ca551eaa0f29cfc4eb230ab02fbc1"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-meta"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Meta\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Meta\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Facebook, Facebook Ads, Facebook Messenger, Instagram, and WhatsApp Business integration services.",
+            "time": "2026-11-18T15:16:39+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-microsoft",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-microsoft.git",
+                "reference": "27e0cf4a36e777645a9bd010a550b74cd3bf282b"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-microsoft"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Microsoft\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Microsoft\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Outlook Mail and Outlook Calendar integration services.",
+            "time": "2026-11-18T15:16:27+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-sso",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-sso.git",
+                "reference": "841df0f5cc9b814fbde6c88dc97cee44e786d0f4"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "liberusoftware/organizations-teams": "^1.0",
+                "liberusoftware/roles-permissions": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-sso"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Sso\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Sso\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "OIDC and SAML SSO connections, controllers, middleware, and JIT provisioning.",
+            "time": "2026-11-18T15:18:12+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-stripe",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-stripe.git",
+                "reference": "9ab360d2cba5dcb34289fad9bcf4e400fef8700a"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "liberusoftware/organizations-teams": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-stripe"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Stripe\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Stripe\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Stripe billing and subscription integration service.",
+            "time": "2026-11-18T15:17:49+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-twilio",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-twilio.git",
+                "reference": "533a0eaec55aea628fa60782deffa343d9457a2c"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-twilio"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Twilio\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Twilio\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Twilio voice, SMS, OAuth provider, and call settings integration.",
+            "time": "2026-11-18T15:17:38+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-twitter",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-twitter.git",
+                "reference": "02ef9ada021fd20c2eb143f6ea5be5960b956ce6"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-twitter"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Twitter\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Twitter\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Twitter / X integration service.",
+            "time": "2026-11-18T15:17:06+00:00"
+        },
+        {
+            "name": "liberusoftware/integrations-zernio",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liberusoftware/module-integrations-zernio.git",
+                "reference": "f6df4e4972980221fb8019680cf4d726cd153ad7"
+            },
+            "require": {
+                "illuminate/support": "^13.38.0",
+                "liberusoftware/integrations": "^1.0",
+                "liberusoftware/organizations-teams": "^1.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.5",
+                "pestphp/pest": "^5.3.3"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "integrations-zernio"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Zernio\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Liberu\\Integrations\\Zernio\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Zernio publishing, advertising, webhook, and tenant provisioning integration.",
+            "time": "2026-11-18T15:18:00+00:00"
         },
         {
             "name": "liberusoftware/jetstream-bridge",

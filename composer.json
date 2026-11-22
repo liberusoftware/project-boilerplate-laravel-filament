@@ -43,6 +43,17 @@
         "liberusoftware/identity-socialstream": "^1.8.2",
         "liberusoftware/import-export": "^1.0",
         "liberusoftware/integrations": "^1.8.2",
+        "liberusoftware/integrations-google": "^1.0",
+        "liberusoftware/integrations-imap-pop3": "^1.0",
+        "liberusoftware/integrations-linkedin": "^1.0",
+        "liberusoftware/integrations-mailchimp": "^1.0",
+        "liberusoftware/integrations-meta": "^1.0",
+        "liberusoftware/integrations-microsoft": "^1.0",
+        "liberusoftware/integrations-sso": "^1.0",
+        "liberusoftware/integrations-stripe": "^1.0",
+        "liberusoftware/integrations-twilio": "^1.0",
+        "liberusoftware/integrations-twitter": "^1.0",
+        "liberusoftware/integrations-zernio": "^1.0",
         "liberusoftware/jetstream-bridge": "^1.0",
         "liberusoftware/localization-contracts": "^1.0",
         "liberusoftware/localization-core": "^1.5.1",
@@ -271,6 +282,83 @@
             "url": "https://github.com/liberusoftware/passkeys.git",
             "only": [
                 "liberusoftware/passkeys"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-google.git",
+            "only": [
+                "liberusoftware/integrations-google"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-imap-pop3.git",
+            "only": [
+                "liberusoftware/integrations-imap-pop3"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-linkedin.git",
+            "only": [
+                "liberusoftware/integrations-linkedin"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-mailchimp.git",
+            "only": [
+                "liberusoftware/integrations-mailchimp"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-meta.git",
+            "only": [
+                "liberusoftware/integrations-meta"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-microsoft.git",
+            "only": [
+                "liberusoftware/integrations-microsoft"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-sso.git",
+            "only": [
+                "liberusoftware/integrations-sso"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-stripe.git",
+            "only": [
+                "liberusoftware/integrations-stripe"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-twilio.git",
+            "only": [
+                "liberusoftware/integrations-twilio"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-twitter.git",
+            "only": [
+                "liberusoftware/integrations-twitter"
+            ]
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/liberusoftware/module-integrations-zernio.git",
+            "only": [
+                "liberusoftware/integrations-zernio"
             ]
         }
     ],

@@ -26,10 +26,6 @@ try {
 
     $mappings = [];
 
-    if (is_dir($module.'/src/Legacy')) {
-        $mappings['App\\'] = [$module.'/src/Legacy'];
-    }
-
     foreach ($composer['autoload']['psr-4'] ?? [] as $namespace => $paths) {
         foreach ((array) $paths as $path) {
             $mappings[$namespace][] = $module.'/'.$path;

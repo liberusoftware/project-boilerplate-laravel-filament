@@ -11,7 +11,7 @@ use ReflectionClass;
 /**
  * Single source of truth for "which Eloquent models are team-scoped."
  *
- * Discovers every instantiable legacy model in the module-owned model paths
+ * Discovers every instantiable tenant model in the module-owned model paths
  * that uses IsTenantModel.
  * Uses the running host when available, with a package-relative fallback at
  * PHPUnit collection time, before the app boots. CrossTenantLeakageTest and

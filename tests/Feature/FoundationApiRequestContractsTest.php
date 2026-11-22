@@ -239,7 +239,7 @@ it('rejects conditional writes without a bound model', function () {
     expect($response->getStatusCode())->toBe(412);
 });
 
-function foundationLegacyIdempotencyRequest(?string $key = 'request-1', string $method = 'POST', int $team = 1): Request
+function foundationIdempotencyRequest(?string $key = 'request-1', string $method = 'POST', int $team = 1): Request
 {
     $request = Request::create('/checkout', $method, [], [], [], [], 'request');
     if ($key !== null) {
@@ -251,12 +251,12 @@ function foundationLegacyIdempotencyRequest(?string $key = 'request-1', string $
     return $request;
 }
 
-it('registers the legacy alias and the configured API rate limiter', function (string $configuration, int $attempts, int $seconds) {
+it('registers the idempotency alias and the configured API rate limiter', function (string $configuration, int $attempts, int $seconds) {
     config(['api-access.rate_limit' => $configuration]);
     // Hosts can replace the limiter; exercise the module provider lifecycle explicitly.
     (new ApiAccessServiceProvider(app()))->boot();
     $limiter = RateLimiter::limiter('api');
-    $request = foundationLegacyIdempotencyRequest();
+    $request = foundationIdempotencyRequest();
     $limit = $limiter($request);
     $guest = Request::create('/checkout', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.9']);
 
@@ -267,28 +267,28 @@ it('registers the legacy alias and the configured API rate limiter', function (s
         ->and($limiter($guest)->key)->toBe('127.0.0.9');
 })->with(['configured period' => ['12,2', 12, 120], 'default period' => ['7', 7, 60]]);
 
-it('bypasses storage when a legacy request has no key', function (string $middlewareClass) {
+it('bypasses storage when an idempotent request has no key', function (string $middlewareClass) {
     $response = (new $middlewareClass(new IdempotencyStore()))->handle(
-        foundationLegacyIdempotencyRequest(null), fn () => new Response('unkeyed', 200),
+        foundationIdempotencyRequest(null), fn () => new Response('unkeyed', 200),
     );
 
     expect($response->getContent())->toBe('unkeyed');
     $this->assertDatabaseCount('api_idempotency_keys', 0);
 })->with([Idempotency::class, ReplayIdempotentRequest::class]);
 
-it('bypasses read requests in the legacy idempotency alias', function (string $method) {
+it('bypasses read requests in the idempotency alias', function (string $method) {
     $response = (new Idempotency(new IdempotencyStore()))->handle(
-        foundationLegacyIdempotencyRequest('request-1', $method), fn () => new Response('read', 200),
+        foundationIdempotencyRequest('request-1', $method), fn () => new Response('read', 200),
     );
 
     expect($response->getContent())->toBe('read');
     $this->assertDatabaseCount('api_idempotency_keys', 0);
 })->with(['GET', 'HEAD', 'OPTIONS']);
 
-it('preserves each legacy replay header and executes a keyed write once', function (string $middlewareClass, string $header) {
+it('preserves each replay header and executes a keyed write once', function (string $middlewareClass, string $header) {
     $middleware = new $middlewareClass(new IdempotencyStore());
-    $first = $middleware->handle(foundationLegacyIdempotencyRequest(' request-1 '), fn () => new Response('{"id":1}', 201));
-    $replay = $middleware->handle(foundationLegacyIdempotencyRequest(), fn () => throw new LogicException('The write must not execute twice.'));
+    $first = $middleware->handle(foundationIdempotencyRequest(' request-1 '), fn () => new Response('{"id":1}', 201));
+    $replay = $middleware->handle(foundationIdempotencyRequest(), fn () => throw new LogicException('The write must not execute twice.'));
 
     expect($first->getStatusCode())->toBe(201)
         ->and($replay->getStatusCode())->toBe(201)
@@ -306,10 +306,10 @@ it('preserves each legacy replay header and executes a keyed write once', functi
 
 it('reports in-progress requests without running another write', function (string $middlewareClass) {
     $middleware = new $middlewareClass(new IdempotencyStore());
-    $middleware->handle(foundationLegacyIdempotencyRequest(), fn () => response()->json(['id' => 1]));
+    $middleware->handle(foundationIdempotencyRequest(), fn () => response()->json(['id' => 1]));
     DB::table('api_idempotency_keys')->update(['response_status' => null, 'response_body' => null]);
 
-    $response = $middleware->handle(foundationLegacyIdempotencyRequest(), fn () => throw new LogicException('The pending write must not execute again.'));
+    $response = $middleware->handle(foundationIdempotencyRequest(), fn () => throw new LogicException('The pending write must not execute again.'));
 
     expect($response->getStatusCode())->toBe(409);
     if ($middlewareClass === ReplayIdempotentRequest::class) {
@@ -320,24 +320,24 @@ it('reports in-progress requests without running another write', function (strin
 it('isolates replay records when an actor changes teams', function (string $middlewareClass) {
     $middleware = new $middlewareClass(new IdempotencyStore());
     foreach ([1, 2] as $team) {
-        $response = $middleware->handle(foundationLegacyIdempotencyRequest('request-1', 'POST', $team), fn () => response()->json(['team' => $team], 201));
+        $response = $middleware->handle(foundationIdempotencyRequest('request-1', 'POST', $team), fn () => response()->json(['team' => $team], 201));
         expect(json_decode($response->getContent(), true)['team'])->toBe($team);
     }
     $this->assertDatabaseCount('api_idempotency_keys', 2);
 })->with([Idempotency::class, ReplayIdempotentRequest::class]);
 
-it('releases a legacy reservation after exceptions', function (string $middlewareClass) {
+it('releases an idempotency reservation after exceptions', function (string $middlewareClass) {
     $exception = new RuntimeException('write failed');
 
     expect(fn () => (new $middlewareClass(new IdempotencyStore()))->handle(
-        foundationLegacyIdempotencyRequest(), fn () => throw $exception,
+        foundationIdempotencyRequest(), fn () => throw $exception,
     ))->toThrow($exception);
     $this->assertDatabaseCount('api_idempotency_keys', 0);
 })->with([Idempotency::class, ReplayIdempotentRequest::class]);
 
-it('releases legacy reservations after server errors or streamed responses', function (string $middlewareClass, bool $streamed) {
+it('releases idempotency reservations after server errors or streamed responses', function (string $middlewareClass, bool $streamed) {
     $response = (new $middlewareClass(new IdempotencyStore()))->handle(
-        foundationLegacyIdempotencyRequest(), fn () => $streamed ? new StreamedResponse(static fn () => null) : new Response('failed', 503),
+        foundationIdempotencyRequest(), fn () => $streamed ? new StreamedResponse(static fn () => null) : new Response('failed', 503),
     );
 
     expect($response->getStatusCode())->toBe($streamed ? 200 : 503);

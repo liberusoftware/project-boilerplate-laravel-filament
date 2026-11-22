@@ -24,10 +24,10 @@ class PermissionCatalog
     private const GUARD = 'web';
 
     /**
-     * Legacy custom permissions kept for backward compatibility with existing
-     * references (reports widget, management gates).
+     * Custom system permissions kept for existing references
+     * (reports widget, management gates).
      */
-    private const LEGACY_PERMISSIONS = [
+    private const DEFAULT_PERMISSIONS = [
         'view_reports', 'manage_users', 'manage_roles', 'manage_permissions',
     ];
 
@@ -64,7 +64,7 @@ class PermissionCatalog
 
     private static function mintPermissions(): void
     {
-        $wanted = [...self::catalogPermissions(), ...self::LEGACY_PERMISSIONS];
+        $wanted = [...self::catalogPermissions(), ...self::DEFAULT_PERMISSIONS];
         $existing = Permission::where('guard_name', self::GUARD)
             ->whereIn('name', $wanted)->pluck('name')->all();
 

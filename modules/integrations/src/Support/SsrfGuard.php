@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Integrations\Support;
 
-use Liberu\Foundation\Integrations\Exceptions\SsoException;
+use InvalidArgumentException;
 
 /**
  * Guards outbound requests to admin-configured URLs (OIDC issuer + the endpoints
@@ -16,27 +16,27 @@ use Liberu\Foundation\Integrations\Exceptions\SsoException;
 class SsrfGuard
 {
     /**
-     * @throws SsoException when the URL is not a public https endpoint.
+     * @throws InvalidArgumentException when the URL is not a public https endpoint.
      */
     public static function assertPublicHttps(string $url): void
     {
         $parts = parse_url($url);
 
         if ($parts === false || ($parts['scheme'] ?? null) !== 'https' || empty($parts['host'])) {
-            throw new SsoException('Identity provider URL must be a valid https URL.');
+            throw new InvalidArgumentException('Identity provider URL must be a valid https URL.');
         }
 
         // Normalise the host (lowercase, strip IPv6 [brackets]).
         $host = trim(strtolower($parts['host']), '[]');
 
         if ($host === 'localhost' || str_ends_with($host, '.localhost')) {
-            throw new SsoException('Identity provider host resolves to a non-public address.');
+            throw new InvalidArgumentException('Identity provider host resolves to a non-public address.');
         }
 
         // IP literal: check it directly.
         if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
             if (! self::isPublicIp($host)) {
-                throw new SsoException('Identity provider host resolves to a non-public address.');
+                throw new InvalidArgumentException('Identity provider host resolves to a non-public address.');
             }
 
             return;
@@ -47,7 +47,7 @@ class SsrfGuard
         // fails on its own — don't block it (and don't couple tests to live DNS).
         foreach (gethostbynamel($host) ?: [] as $ip) {
             if (! self::isPublicIp($ip)) {
-                throw new SsoException('Identity provider host resolves to a non-public address.');
+                throw new InvalidArgumentException('Identity provider host resolves to a non-public address.');
             }
         }
     }
