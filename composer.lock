@@ -7635,16 +7635,16 @@
         },
         {
             "name": "liberusoftware/roles-permissions-filament",
-            "version": "1.6.4",
+            "version": "1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-roles-permissions-filament.git",
-                "reference": "c3349ccf5280ee513bbefdb857740a0772b523e8"
+                "reference": "d2eed989dc3c3cd9e38296bcf9808cfb55052578"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liberusoftware/module-roles-permissions-filament/zipball/c3349ccf5280ee513bbefdb857740a0772b523e8",
-                "reference": "c3349ccf5280ee513bbefdb857740a0772b523e8",
+                "url": "https://api.github.com/repos/liberusoftware/module-roles-permissions-filament/zipball/d2eed989dc3c3cd9e38296bcf9808cfb55052578",
+                "reference": "d2eed989dc3c3cd9e38296bcf9808cfb55052578",
                 "shasum": ""
             },
             "require": {
@@ -7675,9 +7675,9 @@
             "description": "Filament Shield presentation adapter for Liberu authorization.",
             "support": {
                 "issues": "https://github.com/liberusoftware/module-roles-permissions-filament/issues",
-                "source": "https://github.com/liberusoftware/module-roles-permissions-filament/tree/v1.6.4"
+                "source": "https://github.com/liberusoftware/module-roles-permissions-filament/tree/v1.7.1"
             },
-            "time": "2026-11-22T00:43:13+00:00"
+            "time": "2026-11-22T05:30:20+00:00"
         },
         {
             "name": "liberusoftware/scheduler-queues",
