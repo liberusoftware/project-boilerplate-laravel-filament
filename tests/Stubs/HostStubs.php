@@ -1428,3 +1428,119 @@ namespace App\Models {
         }
     }
 }
+
+namespace Webklex\PHPIMAP {
+    if (! class_exists(Attribute::class)) {
+        class Attribute
+        {
+            /** @param array<int, mixed> $values */
+            public function __construct(
+                public string $name = '',
+                public array $values = [],
+            ) {}
+
+            public function first(): mixed
+            {
+                return $this->values[0] ?? null;
+            }
+
+            /** @return array<int, mixed> */
+            public function toArray(): array
+            {
+                return $this->values;
+            }
+
+            public function toString(): string
+            {
+                return (string) ($this->first() ?? '');
+            }
+
+            public function __toString(): string
+            {
+                return $this->toString();
+            }
+        }
+    }
+
+    if (! class_exists(Attachment::class)) {
+        class Attachment
+        {
+            public function getName(): string
+            {
+                return '';
+            }
+
+            public function getSize(): int
+            {
+                return 0;
+            }
+        }
+    }
+
+    if (! class_exists(Message::class)) {
+        class Message {}
+    }
+}
+
+namespace Webklex\PHPIMAP\Support {
+    use Illuminate\Support\Collection;
+
+    if (! class_exists(AttachmentCollection::class)) {
+        class AttachmentCollection extends Collection {}
+    }
+}
+
+namespace MailchimpMarketing {
+    if (! class_exists(ApiClient::class)) {
+        class ApiClient
+        {
+            public mixed $lists = null;
+
+            public mixed $campaigns = null;
+
+            public mixed $reports = null;
+
+            /** @param array<string, mixed> $config */
+            public function setConfig(array $config = []): static
+            {
+                return $this;
+            }
+        }
+    }
+}
+
+namespace Stripe\Exception {
+    if (! class_exists(ApiErrorException::class)) {
+        class ApiErrorException extends \Exception {}
+    }
+
+    if (! class_exists(InvalidRequestException::class)) {
+        class InvalidRequestException extends ApiErrorException
+        {
+            public static function factory(string $message = '', ?int $httpStatus = null): static
+            {
+                return new static($message, $httpStatus ?? 0);
+            }
+        }
+    }
+}
+
+namespace Stripe {
+    if (! class_exists(StripeClient::class)) {
+        class StripeClient
+        {
+            public mixed $paymentMethods = null;
+
+            public mixed $customers = null;
+
+            public mixed $subscriptions = null;
+
+            public mixed $products = null;
+
+            public mixed $prices = null;
+
+            /** @param array<string, mixed>|string $config */
+            public function __construct(array|string $config = []) {}
+        }
+    }
+}
