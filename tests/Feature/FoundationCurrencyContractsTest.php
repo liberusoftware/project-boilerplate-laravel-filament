@@ -50,7 +50,7 @@ it('converts through the installed rate provider and shares cached quotes until 
     $at = new DateTimeImmutable('2026-01-01T00:00:00Z');
     $quote = app(ExchangeRateProvider::class)->rate($registry->get('USD'), $registry->get('EUR'), $at);
     expect($quote->effectiveAt->getTimestamp())->toBe(1700000000)
-        ->and($quote->source)->toBe('open.er-api.com')
+        ->and($quote->source)->toBe('host-rates.example.test')
         ->and($quote->rate)->toBe('0.9');
     $this->travel(599)->seconds();
     expect($converter->convertAmount(100, 'USD', 'EUR'))->toBe(90.0);

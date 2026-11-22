@@ -1,9 +1,5 @@
 # Changelog
 
-## 1.6.3 - 2026-11-18
-
-- Document the default view namespace and theme override path (`THEMES.md` §5).
-
 ## 1.6.2 - 2026-11-14
 
 - Reject redirect referers with lookalike or userinfo hostnames while preserving application paths, queries and fragments.

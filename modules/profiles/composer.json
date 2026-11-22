@@ -19,7 +19,7 @@
       "name": "profiles"
     }
   },
-  "version": "1.6.0",
+  "version": "1.6.2",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\Profiles\\Tests\\": "tests/"

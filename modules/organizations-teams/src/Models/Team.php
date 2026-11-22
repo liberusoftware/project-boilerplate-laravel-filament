@@ -74,6 +74,9 @@ class Team extends JetstreamTeam
         'portal_logo_path',
     ];
 
+    /** @var list<string> */
+    protected $hidden = ['settings'];
+
     /**
      * The attributes that should be cast.
      *
@@ -84,6 +87,7 @@ class Team extends JetstreamTeam
         'archived_at' => 'datetime',
         'setup_completed_at' => 'datetime',
         'marketing_preferences' => 'array',
+        'settings' => 'encrypted:array',
     ];
 
     /**

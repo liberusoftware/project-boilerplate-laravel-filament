@@ -1,0 +1,41 @@
+{
+  "name": "liberusoftware/integrations-zernio",
+  "description": "Zernio publishing, advertising, webhook, and tenant provisioning integration.",
+  "type": "liberu-module",
+  "license": "MIT",
+  "require": {
+    "php": "^8.5",
+    "illuminate/support": "^13.38.0",
+    "liberusoftware/integrations": "^1.0",
+    "liberusoftware/organizations-teams": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Liberu\\Integrations\\Zernio\\": "src/"
+    }
+  },
+  "extra": {
+    "liberu": {
+      "name": "integrations-zernio"
+    }
+  },
+  "version": "1.0.0",
+  "autoload-dev": {
+    "psr-4": {
+      "Liberu\\Integrations\\Zernio\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "liberusoftware/package-testbench": "^1.5",
+    "pestphp/pest": "^5.3.3"
+  },
+  "scripts": {
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=100"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

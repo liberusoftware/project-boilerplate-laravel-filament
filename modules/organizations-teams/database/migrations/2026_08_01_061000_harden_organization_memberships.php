@@ -39,10 +39,18 @@ return new class() extends Migration
 
     public function down(): void
     {
-        Schema::table('team_invitations', fn (Blueprint $t) => $t->dropColumn(['token_hash', 'invited_by', 'expires_at', 'accepted_at', 'revoked_at']));
-        Schema::table('team_user', fn (Blueprint $t) => $t->dropColumn(['status', 'invited_by', 'effective_from', 'effective_until', 'terms_accepted_at']));
+        Schema::table('team_invitations', function (Blueprint $t): void {
+            $t->dropUnique(['token_hash']);
+            $t->dropIndex(['expires_at']);
+            $t->dropColumn(['token_hash', 'invited_by', 'expires_at', 'accepted_at', 'revoked_at']);
+        });
+        Schema::table('team_user', function (Blueprint $t): void {
+            $t->dropIndex(['status']);
+            $t->dropColumn(['status', 'invited_by', 'effective_from', 'effective_until', 'terms_accepted_at']);
+        });
         Schema::table('teams', function (Blueprint $t): void {
             $t->dropConstrainedForeignId('organization_id');
+            $t->dropIndex(['status']);
             $t->dropColumn('status');
         });
         Schema::dropIfExists('organizations');

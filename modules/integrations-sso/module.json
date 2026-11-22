@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "integrations-sso",
+  "display_name": "SSO Integrations",
+  "description": "OIDC and SAML SSO connections, controllers, middleware, and JIT provisioning.",
+  "version": "1.1.0",
+  "category": "adapter",
+  "provider": "Liberu\\Integrations\\Sso\\IntegrationsSsoServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/integrations": "^1.0",
+      "liberusoftware/organizations-teams": "^1.0",
+      "liberusoftware/roles-permissions": "^1.0"
+    }
+  },
+  "suggests": [],
+  "capabilities": [
+    "integrations.sso"
+  ],
+  "default_enabled": true,
+  "features": [
+    "SSO Integrations"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "integrations-microsoft",
+  "display_name": "Microsoft Integrations",
+  "description": "Outlook Mail and Outlook Calendar integration services.",
+  "version": "1.0.1",
+  "category": "adapter",
+  "provider": "Liberu\\Integrations\\Microsoft\\IntegrationsMicrosoftServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/integrations": "^1.0"
+    }
+  },
+  "suggests": [],
+  "capabilities": [
+    "integrations.microsoft"
+  ],
+  "default_enabled": true,
+  "features": [
+    "Microsoft Integrations"
+  ]
+}
