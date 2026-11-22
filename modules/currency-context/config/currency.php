@@ -18,4 +18,8 @@ return [
     // replaced with the ISO code. Refreshed at most once per
     // stale_after_seconds — this provider itself updates daily anyway.
     'exchange_rate_api_url' => env('EXCHANGE_RATE_API_URL', 'https://open.er-api.com/v6/latest/{base}'),
+
+    // Optional endpoint with the same response shape, tried when the primary
+    // returns no rates. Configure explicitly for your chosen provider.
+    'exchange_rate_api_fallback_url' => env('EXCHANGE_RATE_API_FALLBACK_URL', ''),
 ];

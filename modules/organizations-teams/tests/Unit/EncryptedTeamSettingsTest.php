@@ -18,7 +18,7 @@ afterEach(function () {
 });
 
 it('encrypts workspace credentials and excludes them from serialization and mass assignment', function () {
-    $team = new Team;
+    $team = new Team();
     $team->forceFill(['name' => 'Workspace', 'settings' => ['api_key' => 'private-key']]);
     $raw = $team->getAttributes()['settings'];
 
@@ -28,14 +28,14 @@ it('encrypts workspace credentials and excludes them from serialization and mass
     $team->fill(['settings' => ['api_key' => 'untrusted-replacement']]);
     expect($team->settings['api_key'])->toBe('private-key');
 
-    $loaded = new Team;
+    $loaded = new Team();
     $loaded->setRawAttributes(['settings' => $raw]);
     expect($loaded->settings)->toBe(['api_key' => 'private-key']);
 });
 
 it('adds portable encrypted settings only when teams exist and preserves them on rollback', function () {
     $previous = Facade::getFacadeApplication();
-    $container = new Container;
+    $container = new Container();
     $database = new Capsule($container);
     $database->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
     $container->instance('db', $database->getDatabaseManager());

@@ -64,7 +64,6 @@ namespace {
     use Liberu\Foundation\Integrations\Models\Webhook;
     use Liberu\Foundation\Organizations\Actions\Jetstream\AddTeamMember;
     use Liberu\Foundation\Organizations\Actions\Jetstream\CreateTeam as JetstreamCreateTeam;
-    use Liberu\Foundation\Organizations\Actions\Jetstream\DeleteTeam;
     use Liberu\Foundation\Organizations\Actions\Jetstream\InviteTeamMember;
     use Liberu\Foundation\Organizations\Actions\Jetstream\RemoveTeamMember;
     use Liberu\Foundation\Organizations\Actions\Jetstream\UpdateTeamName;

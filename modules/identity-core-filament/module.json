@@ -3,7 +3,7 @@
   "name": "identity-core-filament",
   "display_name": "Identity Administration",
   "description": "Optional Filament user and role administration surface.",
-  "version": "1.7.1",
+  "version": "1.7.4",
   "category": "presentation",
   "provider": "Liberu\\Foundation\\IdentityFilament\\IdentityFilamentServiceProvider",
   "requires": {
