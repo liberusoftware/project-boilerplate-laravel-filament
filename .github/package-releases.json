@@ -329,11 +329,11 @@
   },
   "liberusoftware/tenancy": {
     "path": "modules/tenancy",
-    "reference": "5c079502cf9c82c304f37eab141c8c7d5a77b2b7",
+    "reference": "0a0de654ef3046ccfc8206ec545b7af6a5b168ef",
     "repository": "https://github.com/liberusoftware/module-tenancy",
-    "source_signature": "d469d350ee02b7822a5fa89a3d1bcf1bbd06fa4f8e46fc06e6644ffc88c0b8e5",
-    "source_tree": "04f69949afdcdb6c12817d536fee1706df06aa5d",
-    "version": "1.2.2"
+    "source_signature": "255b0077a4625629072b78977514a42dda8e33461ac9f06aa4a5a56f4ba30b39",
+    "source_tree": "b39293875895c49be3c4cc1d6af5832816848e47",
+    "version": "1.2.4"
   },
   "liberusoftware/theme-base": {
     "path": "themes/base",
