@@ -31,6 +31,14 @@
     "source_tree": "69bc73da99e6e6e536134df017fac5d70f3f0c8d",
     "version": "1.4.13"
   },
+  "liberusoftware/api-access": {
+    "path": "modules/api-access",
+    "reference": "a6dae33b8cfb6ecca4bc939a8b77a4385264b641",
+    "repository": "https://github.com/liberusoftware/module-api-access",
+    "source_signature": "702956077d7b534de6e7f319adcbff71948e314d32b1f9a9f0bdb702f482317a",
+    "source_tree": "bc17c85d6217d098ab6858a25c48b32630b48039",
+    "version": "1.6.5"
+  },
   "liberusoftware/application": {
     "path": "modules/application",
     "reference": "65df99cf12034e20ded8add60262fcc102435c40",
@@ -255,6 +263,14 @@
     "source_tree": "4a04658725b2f80c78b9aa629fdd666b5214c8f5",
     "version": "1.4.8"
   },
+  "liberusoftware/organizations-teams": {
+    "path": "modules/organizations-teams",
+    "reference": "a727ec8a5556d0c6c945c15271d8cd41c0b37732",
+    "repository": "https://github.com/liberusoftware/module-organizations-teams",
+    "source_signature": "0bb035ae62ecffe515b0da7076000c4bfda36fb7edcb1b5769ffa6a75ddb4bda",
+    "source_tree": "e7e04bbe495ddc4b7e3d71d40451caa38b59c2b4",
+    "version": "1.12.2"
+  },
   "liberusoftware/organizations-teams-filament": {
     "path": "modules/organizations-teams-filament",
     "reference": "335c9b835bfcab7d77d3c2495e21572d06636521",
@@ -278,6 +294,22 @@
     "source_signature": "cb7648e7b81ef9d1581dc267a37a2664df823d0af6c5a0c6b3b3649522d57b40",
     "source_tree": "d2bad2c00c9d2f3f6fb461d220da3d4016f86bc0",
     "version": "1.9.0"
+  },
+  "liberusoftware/roles-permissions-filament": {
+    "path": "modules/roles-permissions-filament",
+    "reference": "d2eed989dc3c3cd9e38296bcf9808cfb55052578",
+    "repository": "https://github.com/liberusoftware/module-roles-permissions-filament",
+    "source_signature": "bfab2eb6d213d3d6380c56e173eef496c851c0bdd0522abc65d390aeb44f107c",
+    "source_tree": "ff260e4afb572be38f3007c6808b6294912ea6bb",
+    "version": "1.7.1"
+  },
+  "liberusoftware/scheduler-queues": {
+    "path": "modules/scheduler-queues",
+    "reference": "a3edadb873350ad2baf313b02ac0e1b518c7bc54",
+    "repository": "https://github.com/liberusoftware/module-scheduler-queues",
+    "source_signature": "db2a49eb52eb317111f6b1b71cfbb6858c49f0a4b6a5cfdd9bc0b6e9d6281ff3",
+    "source_tree": "711e63afa70c129486965d86884c54e28c80e4e2",
+    "version": "1.6.2"
   },
   "liberusoftware/search": {
     "path": "modules/search",
@@ -366,6 +398,14 @@
     "source_signature": "5a6d5fca80ff251a2bd79cd7c36e9f442b0dd92453745f082d93680797c415db",
     "source_tree": "d9def70b350f2da2551e9085b79c4e27b8af9a49",
     "version": "1.11.0"
+  },
+  "liberusoftware/theme-support": {
+    "path": "modules/theme-support",
+    "reference": "c33df013cf00cbb2ad21ae74ac9b5a696ef94088",
+    "repository": "https://github.com/liberusoftware/module-theme-support",
+    "source_signature": "2b1e8306c7e38dcaaec3bb606c51ad70021b2f18a2d42f4aae5dba5fb64374e7",
+    "source_tree": "e2270db92d78a10a8892161f4553d9e827ec67cc",
+    "version": "1.9.1"
   },
   "liberusoftware/theme-support-livewire": {
     "path": "modules/theme-support-livewire",
