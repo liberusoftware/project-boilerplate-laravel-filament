@@ -5885,16 +5885,16 @@
         },
         {
             "name": "liberusoftware/api-access",
-            "version": "1.6.4",
+            "version": "1.6.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-api-access.git",
-                "reference": "1b4aa51530707c4dd5109eb7018c37e3825cfe7b"
+                "reference": "a6dae33b8cfb6ecca4bc939a8b77a4385264b641"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liberusoftware/module-api-access/zipball/1b4aa51530707c4dd5109eb7018c37e3825cfe7b",
-                "reference": "1b4aa51530707c4dd5109eb7018c37e3825cfe7b",
+                "url": "https://api.github.com/repos/liberusoftware/module-api-access/zipball/a6dae33b8cfb6ecca4bc939a8b77a4385264b641",
+                "reference": "a6dae33b8cfb6ecca4bc939a8b77a4385264b641",
                 "shasum": ""
             },
             "require": {
@@ -5927,9 +5927,9 @@
             "description": "API token, scope, version, rate-limit, idempotency, and revocation policy.",
             "support": {
                 "issues": "https://github.com/liberusoftware/module-api-access/issues",
-                "source": "https://github.com/liberusoftware/module-api-access/tree/v1.6.4"
+                "source": "https://github.com/liberusoftware/module-api-access/tree/v1.6.5"
             },
-            "time": "2026-11-21T17:58:25+00:00"
+            "time": "2026-11-22T05:18:42+00:00"
         },
         {
             "name": "liberusoftware/application",
@@ -7416,11 +7416,11 @@
         },
         {
             "name": "liberusoftware/organizations-teams",
-            "version": "1.12.0",
+            "version": "1.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-organizations-teams.git",
-                "reference": "e889d57baac138320a3d9800c620073bc9dddea5"
+                "reference": "a727ec8a5556d0c6c945c15271d8cd41c0b37732"
             },
             "require": {
                 "laravel/jetstream": "^5.5.3",
@@ -7460,7 +7460,7 @@
                 "MIT"
             ],
             "description": "Organization, team, membership, invitation, ownership, and context foundation.",
-            "time": "2026-11-22T04:50:53+00:00"
+            "time": "2026-11-22T05:19:15+00:00"
         },
         {
             "name": "liberusoftware/organizations-teams-filament",
@@ -7681,16 +7681,16 @@
         },
         {
             "name": "liberusoftware/scheduler-queues",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-scheduler-queues.git",
-                "reference": "28017c885ee73ae7ea40b1d7a75d9b93d82b5e01"
+                "reference": "a3edadb873350ad2baf313b02ac0e1b518c7bc54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liberusoftware/module-scheduler-queues/zipball/28017c885ee73ae7ea40b1d7a75d9b93d82b5e01",
-                "reference": "28017c885ee73ae7ea40b1d7a75d9b93d82b5e01",
+                "url": "https://api.github.com/repos/liberusoftware/module-scheduler-queues/zipball/a3edadb873350ad2baf313b02ac0e1b518c7bc54",
+                "reference": "a3edadb873350ad2baf313b02ac0e1b518c7bc54",
                 "shasum": ""
             },
             "require": {
@@ -7722,9 +7722,9 @@
             "description": "Queue idempotency, retry, failure, scheduling, locking, and deployment conventions.",
             "support": {
                 "issues": "https://github.com/liberusoftware/module-scheduler-queues/issues",
-                "source": "https://github.com/liberusoftware/module-scheduler-queues/tree/v1.6.1"
+                "source": "https://github.com/liberusoftware/module-scheduler-queues/tree/v1.6.2"
             },
-            "time": "2026-11-22T00:41:58+00:00"
+            "time": "2026-11-22T05:19:22+00:00"
         },
         {
             "name": "liberusoftware/search",
@@ -8004,16 +8004,16 @@
         },
         {
             "name": "liberusoftware/tenancy",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-tenancy.git",
-                "reference": "9c107d1e47b0e164cd297a5537255e61e99d8c07"
+                "reference": "0a0de654ef3046ccfc8206ec545b7af6a5b168ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liberusoftware/module-tenancy/zipball/9c107d1e47b0e164cd297a5537255e61e99d8c07",
-                "reference": "9c107d1e47b0e164cd297a5537255e61e99d8c07",
+                "url": "https://api.github.com/repos/liberusoftware/module-tenancy/zipball/0a0de654ef3046ccfc8206ec545b7af6a5b168ef",
+                "reference": "0a0de654ef3046ccfc8206ec545b7af6a5b168ef",
                 "shasum": ""
             },
             "require": {
@@ -8051,9 +8051,9 @@
             "description": "Shared Filament and Jetstream team tenancy with scoped runtime context and Eloquent isolation.",
             "support": {
                 "issues": "https://github.com/liberusoftware/module-tenancy/issues",
-                "source": "https://github.com/liberusoftware/module-tenancy/tree/v1.2.3"
+                "source": "https://github.com/liberusoftware/module-tenancy/tree/v1.2.4"
             },
-            "time": "2026-11-14T14:54:09+00:00"
+            "time": "2026-11-22T05:18:36+00:00"
         },
         {
             "name": "liberusoftware/theme-base",
@@ -8236,11 +8236,11 @@
         },
         {
             "name": "liberusoftware/theme-support",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-theme-support.git",
-                "reference": "d8788d6f989e7d62b13e87321530287bee70459d"
+                "reference": "c33df013cf00cbb2ad21ae74ac9b5a696ef94088"
             },
             "require": {
                 "liberusoftware/module-manager": "^1.0",
@@ -8284,7 +8284,7 @@
                 "MIT"
             ],
             "description": "Theme discovery and host presentation support for Liberu applications.",
-            "time": "2026-11-22T00:42:05+00:00"
+            "time": "2026-11-22T05:19:45+00:00"
         },
         {
             "name": "liberusoftware/theme-support-livewire",

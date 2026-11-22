@@ -3,7 +3,17 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\DeleteAction;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Validation\ValidationException;
 use JoelButcher\Socialstream\Contracts\AuthenticatesOAuthCallback;
 use JoelButcher\Socialstream\Events\NewOAuthRegistration;
 use Laravel\Socialite\Contracts\User as SocialiteUserContract;
@@ -28,6 +39,14 @@ use Liberu\Foundation\Integrations\Contracts\OAuthIntegrationAdapter;
 use Liberu\Foundation\Integrations\Support\IntegrationRegistry;
 use Liberu\Foundation\Organizations\Actions\Jetstream\DeleteTeam;
 use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\RolesPermissions\Support\RolePermissionCatalog;
+use Liberu\Foundation\RolesPermissionsFilament\Forms\RolePermissionBuilder;
+use Liberu\Foundation\RolesPermissionsFilament\Resources\RoleResource;
+use Liberu\Foundation\RolesPermissionsFilament\Resources\RoleResource\Pages\CreateRole;
+use Liberu\Foundation\RolesPermissionsFilament\Resources\RoleResource\Pages\EditRole;
+use Liberu\Foundation\RolesPermissionsFilament\Resources\RoleResource\Pages\ListRoles;
+use Livewire\Component;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
@@ -293,4 +312,132 @@ it('covers Jetstream DeleteTeam action', function (): void {
     (new DeleteTeam())->delete($team);
 
     expect(Team::withArchived()->find($team->id))->toBeNull();
+});
+
+it('covers RolesPermissionsFilament RolePermissionBuilder, RoleResource, and its Pages', function (): void {
+    if (! Illuminate\Support\Facades\Schema::hasTable('audit_logs')) {
+        Illuminate\Support\Facades\Schema::create('audit_logs', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
+            $table->string('action');
+            $table->text('description')->nullable();
+            $table->string('auditable_type')->nullable();
+            $table->unsignedBigInteger('auditable_id')->nullable();
+            $table->json('changes')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->timestamps();
+        });
+    }
+    $superAdminRole = Role::firstOrCreate([
+        'name' => Liberu\Foundation\RolesPermissions\Enums\Role::SuperAdmin->value,
+        'guard_name' => 'web',
+        'team_id' => null,
+    ]);
+    $user = User::factory()->withPersonalTeam()->create();
+    setPermissionsTeamId($user->currentTeam->id);
+    $user->assignRole($superAdminRole);
+
+    // Unauthenticated / non-super-admin denials
+    auth()->logout();
+    $globalRole = Role::create(['name' => 'custom_global', 'guard_name' => 'web', 'team_id' => null]);
+    expect(RoleResource::canAccess())->toBeFalse()
+        ->and(RoleResource::canViewAny())->toBeFalse()
+        ->and(RoleResource::getViewAnyAuthorizationResponse()->allowed())->toBeFalse()
+        ->and(RoleResource::canCreate())->toBeFalse()
+        ->and(RoleResource::getCreateAuthorizationResponse()->allowed())->toBeFalse()
+        ->and(RoleResource::canView($globalRole))->toBeFalse()
+        ->and(RoleResource::getViewAuthorizationResponse($globalRole)->allowed())->toBeFalse()
+        ->and(RoleResource::canEdit($globalRole))->toBeFalse()
+        ->and(RoleResource::getEditAuthorizationResponse($globalRole)->allowed())->toBeFalse()
+        ->and(RoleResource::canDelete($globalRole))->toBeFalse()
+        ->and(RoleResource::getDeleteAuthorizationResponse($globalRole)->allowed())->toBeFalse()
+        ->and(RoleResource::canDeleteAny())->toBeFalse()
+        ->and(RoleResource::getDeleteAnyAuthorizationResponse()->allowed())->toBeFalse();
+
+    // Super admin allowances
+    $this->actingAs($user);
+    expect(RoleResource::canAccess())->toBeTrue()
+        ->and(RoleResource::getViewAnyAuthorizationResponse()->allowed())->toBeTrue()
+        ->and(RoleResource::getCreateAuthorizationResponse()->allowed())->toBeTrue()
+        ->and(RoleResource::getViewAuthorizationResponse($globalRole)->allowed())->toBeTrue()
+        ->and(RoleResource::getEditAuthorizationResponse($globalRole)->allowed())->toBeTrue()
+        ->and(RoleResource::getDeleteAuthorizationResponse($globalRole)->allowed())->toBeTrue()
+        ->and(RoleResource::getEloquentQuery()->count())->toBeGreaterThanOrEqual(2)
+        ->and(RoleResource::getPages())->toHaveKeys(['index', 'create', 'edit']);
+
+    // RolePermissionBuilder components + closures
+    $schema = Schema::make(new class() extends Component implements HasSchemas
+    {
+        use InteractsWithSchemas;
+
+        /** @var array<string, mixed> */
+        public array $data = ['permissions' => ['delete_user', 'view_user']];
+    })->statePath('data');
+    $components = RoleResource::form($schema)->getComponents();
+    expect($components)->toHaveCount(2);
+
+    // Exercise RolePermissionBuilder callbacks directly via reflection on schema components
+    $section1Children = $components[0]->getChildSchema()->getComponents();
+    $nameField = $section1Children[0];
+    $presetField = $section1Children[1];
+    $presets = array_keys(RolePermissionCatalog::presets());
+    $presetField->state(null)->callAfterStateUpdated();
+    if ($presets !== []) {
+        $presetField->state($presets[0])->callAfterStateUpdated();
+    }
+    $refReadOnly = new ReflectionProperty($nameField, 'isReadOnly');
+    $roCb = $refReadOnly->getValue($nameField);
+    if ($roCb instanceof Closure) {
+        expect($roCb($superAdminRole))->toBeTrue()
+            ->and($roCb($globalRole))->toBeFalse();
+    }
+    $section2Children = $components[1]->getChildSchema()->getComponents();
+    $placeholder = $section2Children[0];
+    expect((string) $placeholder->getContent())->toContain('permissions selected');
+
+    // Table definition + scope column + delete action closure
+    $livewireTable = new class() extends Component implements HasActions, HasSchemas, HasTable
+    {
+        use InteractsWithActions;
+        use InteractsWithSchemas;
+        use InteractsWithTable;
+    };
+    $table = RoleResource::table(Table::make($livewireTable));
+    $scopeCol = $table->getColumn('scope');
+    expect($scopeCol)->not->toBeNull();
+    $refState = new ReflectionProperty($scopeCol, 'getStateUsing');
+    expect(($refState->getValue($scopeCol))())->toBe('Global');
+
+    $deletableRole = Role::create(['name' => 'temp_delete_me', 'guard_name' => 'web', 'team_id' => null]);
+    $deleteAction = collect($table->getRecordActions())->first(fn ($a) => $a instanceof DeleteAction);
+    $refUsing = new ReflectionProperty($deleteAction, 'using');
+    expect(($refUsing->getValue($deleteAction))($deletableRole))->toBeTrue();
+
+    // ListRoles page methods
+    $listPage = new ListRoles();
+    expect($listPage->getSubheading())->toContain('Global definitions');
+    $refHeader = new ReflectionMethod($listPage, 'getHeaderActions');
+    expect($refHeader->invoke($listPage))->toHaveCount(1);
+
+    // CreateRole page: success & validation error paths
+    $createPage = new CreateRole();
+    $refCreate = new ReflectionMethod($createPage, 'handleRecordCreation');
+    $created = $refCreate->invoke($createPage, ['name' => 'created_global_role', 'permissions' => []]);
+    expect($created)->toBeInstanceOf(Role::class);
+    expect(fn () => $refCreate->invoke($createPage, ['name' => 'created_global_role', 'permissions' => []]))
+        ->toThrow(ValidationException::class);
+
+    // EditRole page: mutateFormDataBeforeFill, handleRecordUpdate success & validation error
+    $editPage = new EditRole();
+    $editPage->record = $created;
+    $refMutate = new ReflectionMethod($editPage, 'mutateFormDataBeforeFill');
+    $filled = $refMutate->invoke($editPage, ['name' => $created->name]);
+    expect($filled)->toHaveKey('permissions');
+
+    $refUpdate = new ReflectionMethod($editPage, 'handleRecordUpdate');
+    $updated = $refUpdate->invoke($editPage, $created, ['name' => 'renamed_global_role', 'permissions' => []]);
+    expect($updated->name)->toBe('renamed_global_role');
+    expect(fn () => $refUpdate->invoke($editPage, $created, ['name' => '', 'permissions' => []]))
+        ->toThrow(ValidationException::class);
 });
