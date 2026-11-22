@@ -1,0 +1,40 @@
+{
+  "name": "liberusoftware/integrations-imap-pop3",
+  "description": "IMAP and POP3 email integration services.",
+  "type": "liberu-module",
+  "license": "MIT",
+  "require": {
+    "php": "^8.5",
+    "illuminate/support": "^13.38.0",
+    "liberusoftware/integrations": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Liberu\\Integrations\\ImapPop3\\": "src/"
+    }
+  },
+  "extra": {
+    "liberu": {
+      "name": "integrations-imap-pop3"
+    }
+  },
+  "version": "1.0.0",
+  "autoload-dev": {
+    "psr-4": {
+      "Liberu\\Integrations\\ImapPop3\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "liberusoftware/package-testbench": "^1.5",
+    "pestphp/pest": "^5.3.3"
+  },
+  "scripts": {
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=100"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "integrations-zernio",
+  "display_name": "Zernio Integrations",
+  "description": "Zernio publishing, advertising, webhook, and tenant provisioning integration.",
+  "version": "1.0.0",
+  "category": "adapter",
+  "provider": "Liberu\\Integrations\\Zernio\\IntegrationsZernioServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/integrations": "^1.0",
+      "liberusoftware/organizations-teams": "^1.0"
+    }
+  },
+  "suggests": [],
+  "capabilities": [
+    "integrations.zernio"
+  ],
+  "default_enabled": true,
+  "features": [
+    "Zernio Integrations"
+  ]
+}

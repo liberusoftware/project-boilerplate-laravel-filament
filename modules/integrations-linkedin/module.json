@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "integrations-linkedin",
+  "display_name": "LinkedIn Integrations",
+  "description": "LinkedIn organic and LinkedIn Ads integration services.",
+  "version": "1.0.0",
+  "category": "adapter",
+  "provider": "Liberu\\Integrations\\LinkedIn\\IntegrationsLinkedinServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/integrations": "^1.0"
+    }
+  },
+  "suggests": [],
+  "capabilities": [
+    "integrations.linkedin"
+  ],
+  "default_enabled": true,
+  "features": [
+    "LinkedIn Integrations"
+  ]
+}

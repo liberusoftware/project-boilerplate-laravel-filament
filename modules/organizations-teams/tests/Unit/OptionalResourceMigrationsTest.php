@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
     $this->previousSchemaApplication = Facade::getFacadeApplication();
-    $this->migrationContainer = new Container();
+    $this->migrationContainer = new Container;
     $this->migrationDatabase = new Capsule($this->migrationContainer);
     $this->migrationDatabase->addConnection(['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']);
     $this->migrationContainer->instance('db', $this->migrationDatabase->getDatabaseManager());
@@ -38,7 +38,7 @@ function optionalResourceMigration(string $name): Migration
 
     require_once $directory.'2024_11_17_000000_add_team_id_to-staff_resource_tables.php';
 
-    return new AddTeamIdToStaffResourceTables();
+    return new AddTeamIdToStaffResourceTables;
 }
 
 it('leaves absent optional resource tables absent during migration and rollback', function (string $name) {
@@ -97,4 +97,18 @@ it('backfills installed tickets without requiring optional resource tables', fun
     $migration->up();
 
     expect(DB::table('tickets')->value('team_id'))->toBe(42);
+});
+
+it('preserves setup completion supplied by the host across migration and rollback', function () {
+    $migration = require dirname(__DIR__, 2).'/database/migrations/2026_09_06_000000_add_setup_completed_at_to_teams_table.php';
+    $migration->up();
+    expect(Schema::hasTable('teams'))->toBeFalse();
+    Schema::create('teams', function (Blueprint $table): void {
+        $table->id();
+        $table->timestamp('setup_completed_at')->nullable();
+    });
+    DB::table('teams')->insert(['id' => 1, 'setup_completed_at' => '2026-11-14 12:00:00']);
+    $migration->up();
+    $migration->down();
+    expect(DB::table('teams')->value('setup_completed_at'))->toBe('2026-11-14 12:00:00');
 });

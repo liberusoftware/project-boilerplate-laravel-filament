@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "integrations-mailchimp",
+  "display_name": "MailChimp Integrations",
+  "description": "MailChimp marketing integration service.",
+  "version": "1.0.0",
+  "category": "adapter",
+  "provider": "Liberu\\Integrations\\MailChimp\\IntegrationsMailchimpServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/integrations": "^1.0"
+    }
+  },
+  "suggests": [],
+  "capabilities": [
+    "integrations.mailchimp"
+  ],
+  "default_enabled": true,
+  "features": [
+    "MailChimp Integrations"
+  ]
+}
