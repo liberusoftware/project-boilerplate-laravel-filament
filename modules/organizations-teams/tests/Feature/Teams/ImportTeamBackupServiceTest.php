@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Teams;
+namespace Liberu\Foundation\Organizations\Tests\Feature\Teams;
 
-use App\Models\Contact;
-use App\Models\Task;
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Liberu\Foundation\Organizations\Exceptions\TeamImportException;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\Organizations\Services\ImportTeamBackupService;
 use Liberu\Foundation\Organizations\Services\TeamBackupService;
+use Liberu\Foundation\Organizations\Support\TenantModels;
+use Liberu\Foundation\Organizations\Tests\Fixtures\TenantChildItem;
+use Liberu\Foundation\Organizations\Tests\Fixtures\TenantItem;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -21,17 +24,41 @@ class ImportTeamBackupServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Back up a team, then delete its rows to simulate a disjoint target env
-     * (a real cross-env import lands in a DB that does not already hold this
-     * team's data / colliding unique values). Returns the backup's local path.
-     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::create('org_test_items', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('team_id');
+            $table->string('name');
+            $table->timestamps();
+        });
+        Schema::create('org_test_child_items', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('team_id');
+            $table->unsignedBigInteger('org_test_item_id')->nullable();
+            $table->unsignedBigInteger('assigned_to')->nullable();
+            $table->string('title')->default('Child');
+            $table->timestamps();
+            $table->foreign('org_test_item_id')->references('id')->on('org_test_items')->nullOnDelete();
+        });
+
+        TenantModels::useModels([TenantItem::class, TenantChildItem::class]);
+    }
+
+    protected function tearDown(): void
+    {
+        TenantModels::useModels(null);
+        parent::tearDown();
+    }
+
     private function backupThenClear(Team $source): string
     {
         $result = (new TeamBackupService())->backup($source, 'local');
 
-        Task::withoutGlobalScope('tenant')->where('team_id', $source->id)->delete();
-        Contact::withoutGlobalScope('tenant')->where('team_id', $source->id)->delete();
+        TenantChildItem::withoutGlobalScopes()->where('team_id', $source->id)->delete();
+        TenantItem::withoutGlobalScopes()->where('team_id', $source->id)->delete();
 
         return Storage::disk('local')->path($result['path']);
     }
@@ -43,9 +70,11 @@ class ImportTeamBackupServiceTest extends TestCase
         $assignee = User::factory()->create();
 
         $source = Team::factory()->create();
-        $contact = Contact::factory()->create(['team_id' => $source->id, 'name' => 'CrossEnv Co']);
-        Task::factory()->create([
-            'team_id' => $source->id, 'contact_id' => $contact->id, 'assigned_to' => $assignee->id,
+        $item = TenantItem::withoutGlobalScopes()->create(['team_id' => $source->id, 'name' => 'CrossEnv Co']);
+        TenantChildItem::withoutGlobalScopes()->create([
+            'team_id' => $source->id,
+            'org_test_item_id' => $item->id,
+            'assigned_to' => $assignee->id,
         ]);
 
         $localZip = $this->backupThenClear($source);
@@ -55,18 +84,15 @@ class ImportTeamBackupServiceTest extends TestCase
         $this->assertNotSame($source->id, $new->id);
         $this->assertSame($importer->id, $new->user_id);
 
-        $newContact = DB::table('contacts')->where('team_id', $new->id)->first();
-        $newTask = DB::table('tasks')->where('team_id', $new->id)->first();
-        $this->assertNotNull($newContact);
-        $this->assertNotNull($newTask);
-        $this->assertSame('CrossEnv Co', $newContact->name);
+        $newItem = DB::table('org_test_items')->where('team_id', $new->id)->first();
+        $newChild = DB::table('org_test_child_items')->where('team_id', $new->id)->first();
+        $this->assertNotNull($newItem);
+        $this->assertNotNull($newChild);
+        $this->assertSame('CrossEnv Co', $newItem->name);
 
-        // New PK, cross-model FK rewired to the imported contact.
-        $this->assertNotSame($contact->id, (int) $newContact->id);
-        $this->assertSame((int) $newContact->id, (int) $newTask->contact_id);
-
-        // User reference resolves to the importer, not the source-env assignee.
-        $this->assertSame($importer->id, (int) $newTask->assigned_to);
+        $this->assertNotSame($item->id, (int) $newItem->id);
+        $this->assertSame((int) $newItem->id, (int) $newChild->org_test_item_id);
+        $this->assertSame($importer->id, (int) $newChild->assigned_to);
     }
 
     public function test_import_is_atomic_and_leaves_no_orphan_team_on_failure(): void
@@ -74,27 +100,25 @@ class ImportTeamBackupServiceTest extends TestCase
         Storage::fake('local');
         $importer = User::factory()->create();
         $source = Team::factory()->create();
-        Contact::factory()->create(['team_id' => $source->id, 'email' => 'dupe@example.com']);
+        TenantItem::withoutGlobalScopes()->create(['team_id' => $source->id, 'name' => 'CorruptMe']);
 
-        // Corrupt one row so the insert fails after the team transaction starts.
         $result = (new TeamBackupService())->backup($source, 'local');
         $zip = new ZipArchive();
         $zip->open(Storage::disk('local')->path($result['path']));
-        $contacts = json_decode((string) $zip->getFromName('models/Contact.json'), true, flags: JSON_THROW_ON_ERROR);
-        $contacts[0]['invalid_column'] = 'forces rollback';
-        $zip->deleteName('models/Contact.json');
-        $zip->addFromString('models/Contact.json', json_encode($contacts, JSON_THROW_ON_ERROR));
+        $items = json_decode((string) $zip->getFromName('models/TenantItem.json'), true, flags: JSON_THROW_ON_ERROR);
+        $items[0]['invalid_column'] = 'forces rollback';
+        $zip->deleteName('models/TenantItem.json');
+        $zip->addFromString('models/TenantItem.json', json_encode($items, JSON_THROW_ON_ERROR));
         $zip->close();
         $teamsBefore = DB::table('teams')->count();
 
         try {
             (new ImportTeamBackupService())->import(Storage::disk('local')->path($result['path']), 'X', $importer);
-            $this->fail('expected a unique-collision failure');
+            $this->fail('expected an insert failure');
         } catch (\Throwable) {
             // expected
         }
 
-        // Team was created inside the transaction -> rolled back, no orphan.
         $this->assertSame($teamsBefore, DB::table('teams')->count());
     }
 

@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Teams;
+namespace Liberu\Foundation\Organizations\Tests\Feature\Teams;
 
-use App\Models\Contact;
-use App\Models\Lead;
-use App\Models\Task;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Liberu\Foundation\Organizations\Exceptions\TeamNotEmptyException;
 use Liberu\Foundation\Organizations\Exceptions\TeamRestoreException;
@@ -15,6 +14,9 @@ use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\Organizations\Models\TeamBackup;
 use Liberu\Foundation\Organizations\Services\TeamBackupService;
 use Liberu\Foundation\Organizations\Services\TeamRestoreService;
+use Liberu\Foundation\Organizations\Support\TenantModels;
+use Liberu\Foundation\Organizations\Tests\Fixtures\TenantChildItem;
+use Liberu\Foundation\Organizations\Tests\Fixtures\TenantItem;
 use Tests\TestCase;
 use Throwable;
 use ZipArchive;
@@ -23,7 +25,33 @@ class TeamRestoreServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** Back up a team and return its completed TeamBackup row. */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::create('org_test_items', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('team_id');
+            $table->string('name');
+            $table->timestamps();
+        });
+        Schema::create('org_test_child_items', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('team_id');
+            $table->unsignedBigInteger('org_test_item_id')->nullable();
+            $table->string('title')->default('Child');
+            $table->timestamps();
+        });
+
+        TenantModels::useModels([TenantItem::class, TenantChildItem::class]);
+    }
+
+    protected function tearDown(): void
+    {
+        TenantModels::useModels(null);
+        parent::tearDown();
+    }
+
     private function backupOf(Team $team): TeamBackup
     {
         $result = (new TeamBackupService())->backup($team, 'local');
@@ -41,30 +69,29 @@ class TeamRestoreServiceTest extends TestCase
     {
         Storage::fake('local');
         $team = Team::factory()->create();
-        $contact = Contact::factory()->create(['team_id' => $team->id, 'name' => 'RoundTrip Co']);
-        $task = Task::factory()->create(['team_id' => $team->id, 'contact_id' => $contact->id]);
+        $item = TenantItem::withoutGlobalScopes()->create(['team_id' => $team->id, 'name' => 'RoundTrip Co']);
+        $child = TenantChildItem::withoutGlobalScopes()->create(['team_id' => $team->id, 'org_test_item_id' => $item->id]);
 
         $backup = $this->backupOf($team);
 
-        Task::withoutGlobalScope('tenant')->where('team_id', $team->id)->delete();
-        Contact::withoutGlobalScope('tenant')->where('team_id', $team->id)->delete();
-        $this->assertDatabaseMissing('contacts', ['id' => $contact->id]);
+        TenantChildItem::withoutGlobalScopes()->where('team_id', $team->id)->delete();
+        TenantItem::withoutGlobalScopes()->where('team_id', $team->id)->delete();
+        $this->assertDatabaseMissing('org_test_items', ['id' => $item->id]);
 
         $restored = (new TeamRestoreService())->restore($backup);
 
-        $this->assertDatabaseHas('contacts', ['id' => $contact->id, 'name' => 'RoundTrip Co', 'team_id' => $team->id]);
-        $this->assertDatabaseHas('tasks', ['id' => $task->id, 'contact_id' => $contact->id]);
-        $this->assertSame(1, $restored['Contact']);
+        $this->assertDatabaseHas('org_test_items', ['id' => $item->id, 'name' => 'RoundTrip Co', 'team_id' => $team->id]);
+        $this->assertDatabaseHas('org_test_child_items', ['id' => $child->id, 'org_test_item_id' => $item->id]);
+        $this->assertSame(1, $restored['TenantItem']);
     }
 
     public function test_refuses_to_restore_over_a_non_empty_team(): void
     {
         Storage::fake('local');
         $team = Team::factory()->create();
-        Contact::factory()->create(['team_id' => $team->id]);
+        TenantItem::withoutGlobalScopes()->create(['team_id' => $team->id, 'name' => 'Existing']);
         $backup = $this->backupOf($team);
 
-        // team still populated -> must refuse
         $this->expectException(TeamNotEmptyException::class);
         (new TeamRestoreService())->restore($backup);
     }
@@ -97,18 +124,16 @@ class TeamRestoreServiceTest extends TestCase
     {
         Storage::fake('local');
         $team = Team::factory()->create();
-        $contact = Contact::factory()->create(['team_id' => $team->id]);
+        $item = TenantItem::withoutGlobalScopes()->create(['team_id' => $team->id, 'name' => 'Item']);
         $backup = $this->backupOf($team);
 
-        // Corrupt a later model's entry (Lead sorts after Contact) with an
-        // unknown column so its insert throws mid-restore.
         $full = Storage::disk('local')->path((string) $backup->path);
         $zip = new ZipArchive();
         $zip->open($full);
-        $zip->addFromString('models/Lead.json', (string) json_encode([['team_id' => $team->id, 'bogus_col' => 1]]));
+        $zip->addFromString('models/TenantChildItem.json', (string) json_encode([['team_id' => $team->id, 'bogus_col' => 1]]));
         $zip->close();
 
-        Contact::withoutGlobalScope('tenant')->where('team_id', $team->id)->delete();
+        TenantItem::withoutGlobalScopes()->where('team_id', $team->id)->delete();
 
         try {
             (new TeamRestoreService())->restore($backup);
@@ -117,8 +142,7 @@ class TeamRestoreServiceTest extends TestCase
             // expected
         }
 
-        // Contact inserted before Lead failed -> transaction rolled back -> gone.
-        $this->assertDatabaseMissing('contacts', ['id' => $contact->id]);
-        $this->assertSame(0, Lead::withoutGlobalScope('tenant')->where('team_id', $team->id)->count());
+        $this->assertDatabaseMissing('org_test_items', ['id' => $item->id]);
+        $this->assertSame(0, TenantChildItem::withoutGlobalScopes()->where('team_id', $team->id)->count());
     }
 }

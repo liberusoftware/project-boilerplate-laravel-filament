@@ -265,14 +265,14 @@
         },
         {
             "type": "git",
-            "url": "https://github.com/liberusoftware/affiliate-contracts.git",
+            "url": "https://github.com/liberusoftware/module-affiliate-contracts.git",
             "only": [
                 "liberusoftware/affiliate-contracts"
             ]
         },
         {
             "type": "git",
-            "url": "https://github.com/liberusoftware/affiliate-core.git",
+            "url": "https://github.com/liberusoftware/module-affiliate-core.git",
             "only": [
                 "liberusoftware/affiliate-core"
             ]

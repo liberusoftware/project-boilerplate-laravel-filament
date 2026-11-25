@@ -20,6 +20,7 @@ use Liberu\Foundation\Organizations\Filament\Resources\TeamResource\Pages\ListTe
 use Liberu\Foundation\Organizations\Http\Middleware\SetFilamentDefaultTenant;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\Organizations\Services\TeamCloneService;
+use Liberu\Foundation\Organizations\Services\TeamDestroyService;
 use Liberu\Foundation\RolesPermissions\Enums\Role;
 
 /**
@@ -119,6 +120,24 @@ class TeamResource extends Resource
                         Notification::make()
                             ->title('Team cloned')
                             ->body("Created “{$new->name}” from “{$record->name}”.")
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('destroy')
+                    ->label('Destroy')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Permanently destroy this team?')
+                    ->modalDescription('This permanently deletes the team, all of its tenant-scoped data, backups, and memberships. This cannot be undone.')
+                    ->visible(fn (Team $record): bool => ! $record->personal_team)
+                    ->action(function (Team $record): void {
+                        $name = $record->name;
+                        app(TeamDestroyService::class)->destroy($record);
+
+                        Notification::make()
+                            ->title('Team destroyed')
+                            ->body("Permanently destroyed “{$name}”.")
                             ->success()
                             ->send();
                     }),

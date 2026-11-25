@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Teams;
+namespace Liberu\Foundation\Organizations\Tests\Feature\Teams;
 
-use App\Models\Pipeline;
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Liberu\Foundation\Organizations\Models\Team;
 use Tests\TestCase;
 
@@ -14,10 +16,17 @@ class CloneTeamCommandTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_command_clones_config_into_a_new_team(): void
+    public function test_command_clones_configured_data_into_a_new_team(): void
     {
+        Schema::create('clone_templates', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('team_id');
+            $table->string('name');
+        });
+        config(['organizations-teams.clone.models' => ['clone_templates']]);
+
         $source = Team::factory()->create();
-        Pipeline::factory()->create(['team_id' => $source->id]);
+        DB::table('clone_templates')->insert(['team_id' => $source->id, 'name' => 'Starter']);
         $owner = User::factory()->create();
 
         $this->artisan('team:clone', [
@@ -29,7 +38,7 @@ class CloneTeamCommandTest extends TestCase
         $new = Team::where('name', 'Fresh Team')->first();
         $this->assertNotNull($new);
         $this->assertSame($owner->id, $new->user_id);
-        $this->assertSame(1, Pipeline::withoutGlobalScope('tenant')->where('team_id', $new->id)->count());
+        $this->assertSame(1, DB::table('clone_templates')->where('team_id', $new->id)->count());
     }
 
     public function test_command_fails_for_unknown_source(): void

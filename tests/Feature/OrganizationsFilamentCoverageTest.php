@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\Territory;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -31,11 +30,6 @@ use Liberu\Foundation\Organizations\Filament\App\Resources\TeamRoleResource;
 use Liberu\Foundation\Organizations\Filament\App\Resources\TeamRoleResource\Pages\CreateTeamRole;
 use Liberu\Foundation\Organizations\Filament\App\Resources\TeamRoleResource\Pages\EditTeamRole;
 use Liberu\Foundation\Organizations\Filament\App\Resources\TeamRoleResource\Pages\ListTeamRoles;
-use Liberu\Foundation\Organizations\Filament\App\Resources\TerritoryResource;
-use Liberu\Foundation\Organizations\Filament\App\Resources\TerritoryResource\Pages\CreateTerritory;
-use Liberu\Foundation\Organizations\Filament\App\Resources\TerritoryResource\Pages\EditTerritory;
-use Liberu\Foundation\Organizations\Filament\App\Resources\TerritoryResource\Pages\ListTerritories;
-use Liberu\Foundation\Organizations\Filament\App\Resources\TerritoryResource\Pages\ViewTerritory;
 use Liberu\Foundation\Organizations\Filament\Resources\TeamBackupResource;
 use Liberu\Foundation\Organizations\Filament\Resources\TeamBackupResource\Pages\ListTeamBackups;
 use Liberu\Foundation\Organizations\Filament\Resources\TeamResource;
@@ -576,42 +570,6 @@ it('covers TeamMemberResource and ListTeamMembers page', function (): void {
     expect(User::where('email', 'brandnew@example.test')->exists())->toBeTrue();
 });
 
-it('covers TerritoryResource and its Pages', function (): void {
-    $owner = User::factory()->create();
-    $team = Team::factory()->create(['user_id' => $owner->id, 'personal_team' => false]);
-    $this->actingAs($owner);
-    Filament::setTenant($team);
-
-    $listPage = new ListTerritories();
-    $schema = TerritoryResource::form(Schema::make($listPage));
-    $components = $schema->getComponents();
-    expect($components)->toHaveCount(2);
-
-    /** @var Select $usersSelect */
-    $usersSelect = $components[1];
-    $modifyQuery = getClosureProperty($usersSelect, 'modifyRelationshipQueryUsing');
-    expect($modifyQuery(User::query()))->toBeInstanceOf(Builder::class);
-
-    Filament::setTenant(null);
-    expect($modifyQuery(User::query()))->toBeInstanceOf(Builder::class);
-    Filament::setTenant($team);
-
-    $table = TerritoryResource::table(Table::make($listPage));
-    expect($table->getColumns())->toHaveCount(3)
-        ->and(TerritoryResource::getPages())->toHaveKeys(['index', 'create', 'view', 'edit']);
-
-    expect(new CreateTerritory())->toBeInstanceOf(CreateRecord::class);
-
-    $editPage = new EditTerritory();
-    expect((new ReflectionMethod($editPage, 'getHeaderActions'))->invoke($editPage))->toHaveCount(1);
-
-    expect((new ReflectionMethod($listPage, 'getHeaderActions'))->invoke($listPage))->toHaveCount(1);
-
-    $viewPage = new ViewTerritory();
-    $infolist = $viewPage->infolist(Schema::make($viewPage));
-    expect($infolist->getComponents())->toHaveCount(3);
-});
-
 it('covers TeamBackupResource, TeamResource, TeamSubscriptionResource, and their Pages', function (): void {
     PermissionCatalog::sync();
     Storage::fake('local');
@@ -741,7 +699,14 @@ it('covers TeamBackupResource, TeamResource, TeamSubscriptionResource, and their
     $cloneCallback($team, ['name' => 'Cloned 1', 'owner_id' => 999999]);
     // Valid owner
     $cloneCallback($team, ['name' => 'Cloned 1', 'owner_id' => $admin->id]);
-    expect(Team::where('name', 'Cloned 1')->exists())->toBeTrue();
+    $clonedForDestroy = Team::where('name', 'Cloned 1')->first();
+    expect($clonedForDestroy)->not->toBeNull();
+
+    // Destroy action
+    $destroyTeamAction = $teamActions->get('destroy');
+    expect((getClosureProperty($destroyTeamAction, 'isVisible'))($clonedForDestroy))->toBeTrue();
+    (getClosureProperty($destroyTeamAction, 'action'))($clonedForDestroy);
+    expect(Team::withArchived()->whereKey($clonedForDestroy->id)->exists())->toBeFalse();
 
     // ListTeams header action (import)
     $listTeamsHeaderActions = (new ReflectionMethod($listTeamsPage, 'getHeaderActions'))->invoke($listTeamsPage);

@@ -2,7 +2,6 @@
 
 namespace Liberu\Foundation\Organizations\Models;
 
-use App\Models\Contact;
 use App\Models\User;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
@@ -150,12 +149,6 @@ class Team extends JetstreamTeam
     {
         $this->archived_at = null;
         $this->save();
-    }
-
-    /** @return HasMany<Contact, $this> */
-    public function contacts(): HasMany
-    {
-        return $this->hasMany(Contact::class);
     }
 
     public function hasActiveSubscription(): bool

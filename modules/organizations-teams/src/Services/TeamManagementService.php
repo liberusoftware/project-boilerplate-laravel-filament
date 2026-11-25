@@ -2,13 +2,12 @@
 
 namespace Liberu\Foundation\Organizations\Services;
 
-use App\Models\Branch;
 use App\Models\User;
-use App\Services\AuditLogService;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\RolesPermissions\Enums\Role;
@@ -43,10 +42,11 @@ class TeamManagementService
             $team->users()->attach($user, ['role' => 'member']);
             $this->assignTeamRole($user, $team, $role);
 
-            app(AuditLogService::class)->record(
+            $this->recordAudit(
                 'team.member_added',
                 "Added {$email} to the team with role {$role->value}",
                 $user,
+                $team,
             );
 
             return $user;
@@ -90,10 +90,11 @@ class TeamManagementService
 
             $team->users()->detach($user);
 
-            app(AuditLogService::class)->record(
+            $this->recordAudit(
                 'team.member_removed',
                 "Removed {$user->getAttribute('email')} from the team",
                 $user,
+                $team,
             );
         });
     }
@@ -129,10 +130,11 @@ class TeamManagementService
             $this->clearTeamRoles($user, $team);
             $user->assignRole($definition);
 
-            app(AuditLogService::class)->record(
+            $this->recordAudit(
                 'team.role_changed',
                 "Changed {$user->getAttribute('email')} from {$previous} to {$role->value}",
                 $user,
+                $team,
             );
         });
     }
@@ -172,10 +174,11 @@ class TeamManagementService
             $this->clearTeamRoles($user, $team);
             $user->assignRole($customRole);
 
-            app(AuditLogService::class)->record(
+            $this->recordAudit(
                 'team.role_changed',
                 "Changed {$user->getAttribute('email')} from {$previous} to {$newRole}",
                 $user,
+                $team,
             );
         });
     }
@@ -200,21 +203,51 @@ class TeamManagementService
 
     public function createDefaultTeamForUser(User $user): Team
     {
-        try {
-            $defaultBranch = Branch::firstOrFail();
-        } catch (ModelNotFoundException) {
-            throw new Exception('No default branch found. Please set up at least one branch.');
+        $name = trim((string) config('organizations-teams.default_team_name', 'Default Team'));
+        if ($name === '') {
+            $name = 'Default Team';
         }
 
         $team = $user->ownedTeams()->create([
-            'name' => $defaultBranch->name.' Team',
+            'name' => $name,
             'personal_team' => false,
-            'branch_id' => $defaultBranch->id,
         ]);
 
         $this->assignTeamRole($user, $team, Role::Admin);
 
         return $team;
+    }
+
+    private function recordAudit(string $action, string $description, ?Model $auditable = null, ?Team $team = null): void
+    {
+        $configured = config('organizations-teams.audit_logger');
+        if (is_string($configured) && $configured !== '' && class_exists($configured)) {
+            $logger = app($configured);
+            if (method_exists($logger, 'record')) {
+                $logger->record($action, $description, $auditable);
+
+                return;
+            }
+        }
+
+        $activityTable = (string) config('activitylog.table_name', 'activity_log');
+        if (! function_exists('activity') || ! Schema::hasTable($activityTable)) {
+            return;
+        }
+
+        $logger = activity('team')
+            ->event($action)
+            ->withProperties(['team_id' => $team?->getKey()]);
+
+        if (Auth::user() instanceof Model) {
+            $logger->causedBy(Auth::user());
+        }
+
+        if ($auditable !== null) {
+            $logger->performedOn($auditable);
+        }
+
+        $logger->log($description);
     }
 
     public function createPersonalTeamForUser(User $user): Team

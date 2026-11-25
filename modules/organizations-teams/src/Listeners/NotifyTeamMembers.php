@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Listeners;
 
-use App\Events\ContactUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class NotifyTeamMembers implements ShouldQueue
 {
-    public function handle(ContactUpdated $event): void
+    public function handle(object $event): void
     {
-        // Notify team members about the contact update
+        // Host applications may extend or replace this listener to notify team members.
     }
 }

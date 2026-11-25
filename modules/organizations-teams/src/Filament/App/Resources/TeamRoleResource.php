@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Filament\App\Resources;
 
-use App\Filament\Forms\RolePermissionBuilder;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -159,7 +160,17 @@ class TeamRoleResource extends Resource
     #[\Override]
     public static function form(Schema $schema): Schema
     {
-        return $schema->components(RolePermissionBuilder::components());
+        $builder = 'Liberu\\Foundation\\RolesPermissionsFilament\\Forms\\RolePermissionBuilder';
+        if (class_exists($builder) && method_exists($builder, 'components')) {
+            return $schema->components($builder::components());
+        }
+
+        return $schema->components([
+            TextInput::make('name')->required()->maxLength(255),
+            CheckboxList::make('permissions')
+                ->label('Allowed actions')
+                ->options(RolePermissionCatalog::options()),
+        ]);
     }
 
     #[\Override]

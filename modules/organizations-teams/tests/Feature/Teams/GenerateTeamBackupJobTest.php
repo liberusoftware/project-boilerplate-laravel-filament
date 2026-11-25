@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Teams;
+namespace Liberu\Foundation\Organizations\Tests\Feature\Teams;
 
-use App\Models\Contact;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Liberu\Foundation\Organizations\Jobs\GenerateTeamBackup;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\Organizations\Models\TeamBackup;
 use Liberu\Foundation\Organizations\Services\TeamBackupService;
+use Liberu\Foundation\Organizations\Support\TenantModels;
+use Liberu\Foundation\Organizations\Tests\Fixtures\TenantItem;
 use RuntimeException;
 use Tests\TestCase;
 use Throwable;
@@ -19,11 +22,31 @@ class GenerateTeamBackupJobTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::create('org_test_items', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('team_id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        TenantModels::useModels([TenantItem::class]);
+    }
+
+    protected function tearDown(): void
+    {
+        TenantModels::useModels(null);
+        parent::tearDown();
+    }
+
     public function test_job_completes_and_records_path_and_size(): void
     {
         Storage::fake('local');
         $team = Team::factory()->create();
-        Contact::factory()->create(['team_id' => $team->id]);
+        TenantItem::withoutGlobalScopes()->create(['team_id' => $team->id, 'name' => 'Sample']);
         $backup = TeamBackup::factory()->create(['team_id' => $team->id, 'disk' => 'local']);
 
         (new GenerateTeamBackup($backup->id))->handle(app(TeamBackupService::class));

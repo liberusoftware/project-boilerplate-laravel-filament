@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Liberu\Foundation\Organizations\Services;
 
 use App\Models\User;
-use App\Support\SchemaGraph;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Liberu\Foundation\Organizations\Exceptions\TeamImportException;
 use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Support\SchemaGraph;
 use Liberu\Foundation\Organizations\Support\TenantModels;
 use ZipArchive;
 
@@ -164,9 +164,9 @@ class ImportTeamBackupService
         }
 
         // Undeclared FKs: many `xxx_id` columns have no DB constraint. Guess the
-        // referenced table by Laravel convention (contact_id -> contacts). The
+        // referenced table by Laravel convention (category_id -> categories). The
         // remap only fires when that table was actually imported, so a wrong
-        // guess (e.g. google_event_id) is harmless — it stays as-is.
+        // guess (e.g. external_event_id) is harmless — it stays as-is.
         foreach (Schema::getColumnListing($table) as $column) {
             if (isset($patchable[$column]) || $column === 'team_id' || $column === 'id') {
                 continue;

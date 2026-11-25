@@ -69,6 +69,7 @@ namespace {
     use Liberu\Foundation\Organizations\Actions\Jetstream\UpdateTeamName;
     use Liberu\Foundation\Organizations\Console\Commands\BackupTeam;
     use Liberu\Foundation\Organizations\Console\Commands\CloneTeam;
+    use Liberu\Foundation\Organizations\Console\Commands\DestroyTeam;
     use Liberu\Foundation\Organizations\Console\Commands\ImportTeam;
     use Liberu\Foundation\Organizations\Console\Commands\RestoreTeam;
     use Liberu\Foundation\Organizations\Exceptions\TeamImportException;
@@ -97,10 +98,12 @@ namespace {
     use Liberu\Foundation\Organizations\Services\ImportTeamBackupService;
     use Liberu\Foundation\Organizations\Services\TeamBackupService;
     use Liberu\Foundation\Organizations\Services\TeamCloneService;
+    use Liberu\Foundation\Organizations\Services\TeamDestroyService;
     use Liberu\Foundation\Organizations\Services\TeamManagementService;
     use Liberu\Foundation\Organizations\Services\TeamRestoreService;
     use Liberu\Foundation\Organizations\Support\AccessContext;
     use Liberu\Foundation\Organizations\Support\PortalCustomer;
+    use Liberu\Foundation\Organizations\Support\SchemaGraph;
     use Liberu\Foundation\Organizations\Support\TenantContext;
     use Liberu\Foundation\Organizations\Support\TenantModels;
     use Liberu\Foundation\RolesPermissions\Enums\Role as RoleEnum;
@@ -461,7 +464,6 @@ namespace {
 
         expect($workTeam->teamInvitations())->toBeInstanceOf(HasMany::class)
             ->and($workTeam->subscription())->toBeInstanceOf(HasOne::class)
-            ->and($workTeam->contacts())->toBeInstanceOf(HasMany::class)
             ->and($workTeam->isArchived())->toBeFalse()
             ->and($workTeam->canAddMoreUsers())->toBeTrue();
 
@@ -765,43 +767,90 @@ namespace {
         expect($importedTeam->name)->toBe('Imported Org')
             ->and($importedTeam->user_id)->toBe($importer->id);
 
-        // TeamCloneService
-        Schema::create('pipelines', function (Blueprint $table): void {
+        // TeamCloneService (configured generically via config — no CRM/automation imports)
+        Schema::create('template_groups', function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('team_id');
             $table->string('name');
         });
-        Schema::create('stages', function (Blueprint $table): void {
+        Schema::create('template_items', function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('team_id');
-            $table->unsignedBigInteger('pipeline_id')->nullable();
+            $table->unsignedBigInteger('group_id')->nullable();
             $table->string('name');
         });
-        Schema::create('workflow_conditions', function (Blueprint $table): void {
+        Schema::create('template_rules', function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('team_id');
-            // Intentionally omit workflow_action_id to cover drift guard $edges === []
+            // Intentionally omit rule_parent_id to cover drift guard $edges === []
             $table->string('field')->default('status');
         });
-        Schema::create('menus', function (Blueprint $table): void {
+        Schema::create('template_nodes', function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('name');
         });
 
-        $pipeId = DB::table('pipelines')->insertGetId(['team_id' => $team->id, 'name' => 'Sales']);
-        DB::table('stages')->insert([
-            ['team_id' => $team->id, 'pipeline_id' => $pipeId, 'name' => 'Qualified'],
-            ['team_id' => $team->id, 'pipeline_id' => null, 'name' => 'Unassigned'],
+        $groupId = DB::table('template_groups')->insertGetId(['team_id' => $team->id, 'name' => 'Default Group']);
+        DB::table('template_items')->insert([
+            ['team_id' => $team->id, 'group_id' => $groupId, 'name' => 'First'],
+            ['team_id' => $team->id, 'group_id' => null, 'name' => 'Unassigned'],
         ]);
-        DB::table('workflow_conditions')->insert(['team_id' => $team->id, 'field' => 'amount']);
-        $parentMenuId = DB::table('menus')->insertGetId(['team_id' => $team->id, 'parent_id' => null, 'name' => 'Root']);
-        DB::table('menus')->insert(['team_id' => $team->id, 'parent_id' => $parentMenuId, 'name' => 'Child']);
+        DB::table('template_rules')->insert(['team_id' => $team->id, 'field' => 'amount']);
+        $parentNodeId = DB::table('template_nodes')->insertGetId(['team_id' => $team->id, 'parent_id' => null, 'name' => 'Root']);
+        DB::table('template_nodes')->insert(['team_id' => $team->id, 'parent_id' => $parentNodeId, 'name' => 'Child']);
+
+        config([
+            'organizations-teams.clone.models' => [
+                'template_groups',
+                'template_items',
+                'template_rules',
+                'template_nodes',
+                'missing_table_ignored',
+                'NonExistent\\Model\\ClassIgnored',
+            ],
+            'organizations-teams.clone.fk_edges' => [
+                'template_items' => ['group_id' => 'template_groups'],
+                'template_rules' => ['rule_parent_id' => 'template_items'],
+                'template_nodes' => ['parent_id' => 'template_nodes'],
+            ],
+        ]);
 
         $clonedTeam = (new TeamCloneService())->clone($team, 'Cloned Team', $importer);
+        $clonedGroup = DB::table('template_groups')->where('team_id', $clonedTeam->id)->first();
+        $clonedItem = DB::table('template_items')->where('team_id', $clonedTeam->id)->where('name', 'First')->first();
+        $clonedRoot = DB::table('template_nodes')->where('team_id', $clonedTeam->id)->whereNull('parent_id')->first();
+        $clonedChild = DB::table('template_nodes')->where('team_id', $clonedTeam->id)->whereNotNull('parent_id')->first();
+
         expect($clonedTeam->name)->toBe('Cloned Team')
-            ->and(DB::table('stages')->where('team_id', $clonedTeam->id)->count())->toBe(2);
+            ->and(DB::table('template_items')->where('team_id', $clonedTeam->id)->count())->toBe(2)
+            ->and((int) $clonedItem->group_id)->toBe((int) $clonedGroup->id)
+            ->and((int) $clonedChild->parent_id)->toBe((int) $clonedRoot->id)
+            ->and(SchemaGraph::edges(['nonexistent_table']))->toBe([]);
+
+        // TeamDestroyService
+        $personalToProtect = Team::factory()->create(['user_id' => $importer->id, 'personal_team' => true]);
+        $importer->forceFill(['current_team_id' => $clonedTeam->id])->save();
+        Storage::disk('local')->put('backups/destroy-me.zip', 'zip');
+        TeamBackup::create([
+            'team_id' => $clonedTeam->id,
+            'disk' => 'local',
+            'path' => 'backups/destroy-me.zip',
+            'status' => 'completed',
+        ]);
+
+        $destroyService = new TeamDestroyService();
+        expect(fn () => $destroyService->destroy($personalToProtect))
+            ->toThrow(DomainException::class, 'Personal teams cannot be destroyed.');
+
+        $destroyedCounts = $destroyService->destroy($clonedTeam);
+        expect($destroyedCounts['teams'] ?? 0)->toBe(1)
+            ->and(Team::withArchived()->whereKey($clonedTeam->id)->exists())->toBeFalse()
+            ->and($importer->fresh()->current_team_id)->toBe($personalToProtect->id);
+        Storage::disk('local')->assertMissing('backups/destroy-me.zip');
+
+        config(['organizations-teams.clone.models' => [], 'organizations-teams.clone.fk_edges' => []]);
     });
 
     it('covers TeamManagementService and all branches', function (): void {
@@ -896,18 +945,7 @@ namespace {
 
         // createDefaultTeamForUser & assignUserToDefaultTeam & switchTeam
         Team::query()->delete();
-        Branch::query()->delete();
-        $newUser = User::factory()->create();
-        expect(fn () => $service->createDefaultTeamForUser($newUser))
-            ->toThrow(Exception::class, 'No default branch found');
-
-        // Fallback to personal team when no default team and no branch
-        $service->assignUserToDefaultTeam($newUser);
-        expect($newUser->fresh()->current_team_id)->not->toBeNull();
-
-        // With a Branch present and no non-personal team
-        Team::query()->where('personal_team', false)->delete();
-        Branch::create(['name' => 'HQ']);
+        config(['organizations-teams.default_team_name' => 'HQ Team']);
         $user2 = User::factory()->create();
         $service->assignUserToDefaultTeam($user2);
         expect($user2->fresh()->currentTeam->name)->toBe('HQ Team');
@@ -929,6 +967,7 @@ namespace {
             $artisan->resolveCommands([
                 BackupTeam::class,
                 CloneTeam::class,
+                DestroyTeam::class,
                 ImportTeam::class,
                 RestoreTeam::class,
             ]);
@@ -1159,7 +1198,7 @@ namespace {
 
         // Listeners
         expect(new SwitchTeam())->toBeInstanceOf(Liberu\Foundation\Tenancy\Listeners\SwitchTeam::class);
-        (new NotifyTeamMembers())->handle(new ContactUpdated());
+        (new NotifyTeamMembers())->handle(new stdClass());
         (new AssignDefaultTeamRole(app(TeamManagementService::class)))->handle(new TeamMemberAdded($team, $repUser));
         (new CreatePersonalTeam(app(TeamManagementService::class)))->handle(new Registered(User::factory()->create()));
         (new ProvisionZernioProfile(new ZernioTenantService(new ZernioClient())))->handle(new TeamCreated($team));

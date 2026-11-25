@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Filament\App\Resources;
 
-use App\Filament\Concerns\EnforcesResourcePermissions;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -32,8 +31,6 @@ use Spatie\Permission\Models\Role as SpatieRole;
  */
 class TeamMemberResource extends Resource
 {
-    use EnforcesResourcePermissions;
-
     public static function permissionResource(): string
     {
         return 'team_member';
