@@ -1444,6 +1444,16 @@ namespace Webklex\PHPIMAP {
                 return $this->values[0] ?? null;
             }
 
+            public function count(): int
+            {
+                return count($this->values);
+            }
+
+            public function toDate(): mixed
+            {
+                return $this->first();
+            }
+
             /** @return array<int, mixed> */
             public function toArray(): array
             {
