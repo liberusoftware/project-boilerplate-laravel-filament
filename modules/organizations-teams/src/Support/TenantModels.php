@@ -20,32 +20,14 @@ use ReflectionClass;
  */
 class TenantModels
 {
-    /** @var list<class-string>|null */
-    private static ?array $override = null;
-
-    /**
-     * Override discovered tenant models (primarily for testing or custom host registries).
-     * Pass null to restore automatic discovery.
-     *
-     * @param  list<class-string>|null  $models
-     */
-    public static function useModels(?array $models): void
-    {
-        self::$override = $models;
-    }
-
     /**
      * @return list<class-string>
      */
     public static function all(): array
     {
-        if (self::$override !== null) {
-            return self::$override;
-        }
-
         $container = Container::getInstance();
         $hostRoot = $container->bound('path.base') ? $container->make('path.base') : null;
-        $projectRoot = is_string($hostRoot) && $hostRoot !== '' ? $hostRoot : dirname(__DIR__, 5);
+        $projectRoot = is_string($hostRoot) && $hostRoot !== '' ? $hostRoot : dirname(__DIR__, 4);
         $files = glob($projectRoot.'/app/Models/*.php') ?: [];
 
         foreach (glob($projectRoot.'/modules/*/src/Models/*.php') ?: [] as $file) {

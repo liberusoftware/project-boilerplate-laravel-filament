@@ -9,37 +9,42 @@ return [
         'free',
     ],
 
-    'default_team_name' => 'Default Team',
+    'default_member_role' => 'sales_rep',
 
-    /*
-    |--------------------------------------------------------------------------
-    | Team Template Cloning
-    |--------------------------------------------------------------------------
-    |
-    | Declare which team-scoped Eloquent models or table names should be copied
-    | when cloning a team as a template. Declared database foreign keys between
-    | cloned tables are remapped automatically; use `fk_edges` to declare any
-    | additional undeclared foreign-key columns:
-    |
-    |   'fk_edges' => [
-    |       App\Models\ChildModel::class => ['parent_id' => App\Models\ParentModel::class],
-    |   ],
-    */
-    'clone' => [
-        'models' => [],
-        'fk_edges' => [],
+    'restricted_roles' => [
+        'sales_rep',
+        'free',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Audit Logging
-    |--------------------------------------------------------------------------
-    |
-    | Optional host-supplied audit logger service (must expose a `record(string
-    | $action, string $description, ?Model $auditable = null)` method) and model
-    | class used by the team role log resource. When null, the module falls back
-    | to Spatie Activitylog.
-    */
-    'audit_logger' => null,
+    'masked_roles' => [
+        'free',
+    ],
+
+    /**
+     * Config models cloned by TeamCloneService when duplicating a team template.
+     * Host applications register their own structural model classes here.
+     *
+     * @var list<class-string>
+     */
+    'cloneable_models' => [],
+
+    /**
+     * Intra-config foreign-key edges to remap during team cloning:
+     * ModelClass::class => ['foreign_key_column' => ReferencedModelClass::class]
+     *
+     * @var array<class-string, array<string, class-string>>
+     */
+    'clone_fk_edges' => [],
+
+    /**
+     * Optional audit log model class displayed by the Filament TeamRoleLogResource.
+     *
+     * @var class-string|null
+     */
     'audit_log_model' => null,
+
+    /**
+     * Named route redirected to after creating a team via the Livewire component.
+     */
+    'tenant_profile_route' => 'filament.app.tenant.profile',
 ];

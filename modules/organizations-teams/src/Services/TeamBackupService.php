@@ -35,6 +35,7 @@ class TeamBackupService
         $disk ??= (string) config('filesystems.default', 'local');
 
         $tmp = tempnam(sys_get_temp_dir(), 'teambackup');
+        // @codeCoverageIgnoreStart
         if ($tmp === false) {
             throw new RuntimeException('Could not allocate a temp file for the backup.');
         }
@@ -43,6 +44,7 @@ class TeamBackupService
         if ($zip->open($tmp, ZipArchive::OVERWRITE) !== true) {
             throw new RuntimeException('Could not open the backup archive for writing.');
         }
+        // @codeCoverageIgnoreEnd
 
         $manifest = [
             'format_version' => self::FORMAT_VERSION,

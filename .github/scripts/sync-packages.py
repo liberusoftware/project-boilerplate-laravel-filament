@@ -299,6 +299,23 @@ def recorded_sync(target, package):
     return reference if re.fullmatch(r'[0-9a-f]{40,64}', reference) and is_ancestor(target, reference, 'HEAD') else None
 
 
+def reconciled_files(destination, target):
+    """Accept only the exact upstream and replacement file contents reviewed together."""
+    receipts = Path('.github/package-reconciliations.json')
+    if not receipts.is_file():
+        return set()
+    reviewed = json.loads(receipts.read_text()).get(destination, {})
+    accepted = set()
+    for name, hashes in reviewed.items():
+        upstream = blob(target, 'HEAD', name)
+        replacement = blob(target, '', name)
+        if upstream is None or replacement is None:
+            continue
+        if [hashlib.sha256(content).hexdigest() for content in (upstream, replacement)] == hashes:
+            accepted.add(name)
+    return accepted
+
+
 def refuse_overwriting_independent_changes(target, destination, path, package):
     """Three-way check: base is this source's last sync, theirs the destination head, ours the staged export."""
     if subprocess.run(['git', 'rev-parse', '--verify', '--quiet', 'HEAD'], cwd=target,
@@ -320,6 +337,9 @@ def refuse_overwriting_independent_changes(target, destination, path, package):
     ours = set(filter(None, git('diff', '--cached', '--name-only', '--no-renames', '-z', 'HEAD', cwd=target).split('\0')))
     conflicts = [name for name in sorted(theirs & ours)
                  if blob(target, since, name) != blob(target, 'HEAD', name) != blob(target, '', name)]
+    if conflicts:
+        reconciled = reconciled_files(destination, target)
+        conflicts = [name for name in conflicts if name not in reconciled]
     if not conflicts:
         return
     history = [since + '..HEAD'] if base else ['HEAD']
@@ -425,6 +445,14 @@ def publish(path, head, before):
             (declared_version[0] == 0 and declared_version[1] != previous_version[1]))
         explicit_bump = declared_version and (incompatible or declared_version > (previous_version or (0, 0, 0)))
         if changed or not has_head or explicit_bump:
+            if has_head:
+                # A partial workflow can publish this package before another package fails.
+                # Use that package's exported commit when calculating its next release.
+                marker = f'chore: sync {path} from {os.environ["GITHUB_REPOSITORY"]}@'
+                previous_message = git('log', '-1', '--format=%B', cwd=target)
+                previous_sync = re.match(re.escape(marker) + r'([0-9a-f]{40,64})\n', previous_message)
+                if previous_sync and is_ancestor(Path.cwd(), previous_sync[1], head):
+                    before = previous_sync[1]
             history = [f'{before}..{head}'] if before and set(before) != {'0'} else [head]
             messages = git('log', '--format=%B', *history, '--', path)
             # Project-wide breaking releases do not change every library's public API.

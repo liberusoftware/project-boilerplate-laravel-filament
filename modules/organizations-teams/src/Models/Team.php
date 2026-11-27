@@ -2,7 +2,6 @@
 
 namespace Liberu\Foundation\Organizations\Models;
 
-use App\Models\User;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Jetstream\Events\TeamCreated;
 use Laravel\Jetstream\Events\TeamDeleted;
 use Laravel\Jetstream\Events\TeamUpdated;
+use Laravel\Jetstream\Jetstream;
 use Laravel\Jetstream\Team as JetstreamTeam;
 use Liberu\Foundation\Organizations\Database\Factories\TeamFactory;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -66,7 +66,6 @@ class Team extends JetstreamTeam
         'organization_id',
         'status',
         'setup_completed_at',
-        'zernio_profile_id',
         'user_id',
         'portal_brand_name',
         'portal_logo_url',
@@ -140,8 +139,14 @@ class Team extends JetstreamTeam
         $this->archived_at = now();
         $this->save();
 
-        foreach (User::query()->where('current_team_id', $this->id)->get() as $user) {
-            $user->forceFill(['current_team_id' => $user->personalTeam()->id])->save();
+        $userModel = Jetstream::userModel();
+
+        foreach ($userModel::query()->where('current_team_id', $this->id)->get() as $user) {
+            $personalTeam = $user->personalTeam();
+
+            if ($personalTeam !== null) {
+                $user->forceFill(['current_team_id' => $personalTeam->id])->save();
+            }
         }
     }
 

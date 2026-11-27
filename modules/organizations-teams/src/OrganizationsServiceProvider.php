@@ -5,21 +5,23 @@ namespace Liberu\Foundation\Organizations;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
-use Liberu\Foundation\Organizations\Console\Commands\BackupTeam;
-use Liberu\Foundation\Organizations\Console\Commands\CloneTeam;
-use Liberu\Foundation\Organizations\Console\Commands\DestroyTeam;
-use Liberu\Foundation\Organizations\Console\Commands\ImportTeam;
-use Liberu\Foundation\Organizations\Console\Commands\RestoreTeam;
+use Liberu\Foundation\Organizations\Contracts\TeamAuditLogger;
+use Liberu\Foundation\Organizations\Contracts\TeamJobNotifier;
 use Liberu\Foundation\Organizations\Models\Membership;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\Organizations\Models\TeamInvitation;
 use Liberu\Foundation\Organizations\Policies\TeamPolicy;
+use Liberu\Foundation\Organizations\Support\NullTeamAuditLogger;
+use Liberu\Foundation\Organizations\Support\NullTeamJobNotifier;
 
 final class OrganizationsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/organizations-teams.php', 'organizations-teams');
+
+        $this->app->bindIf(TeamAuditLogger::class, NullTeamAuditLogger::class);
+        $this->app->bindIf(TeamJobNotifier::class, NullTeamJobNotifier::class);
 
         Jetstream::useTeamModel(Team::class);
         Jetstream::useMembershipModel(Membership::class);
@@ -30,15 +32,5 @@ final class OrganizationsServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         Gate::policy(Team::class, TeamPolicy::class);
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                BackupTeam::class,
-                CloneTeam::class,
-                DestroyTeam::class,
-                ImportTeam::class,
-                RestoreTeam::class,
-            ]);
-        }
     }
 }

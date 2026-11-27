@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e8b489ce3a4fc8c12d16f973262a3b69",
+    "content-hash": "878c63881719b119003dc36490e1040b",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -7416,11 +7416,11 @@
         },
         {
             "name": "liberusoftware/organizations-teams",
-            "version": "1.12.2",
+            "version": "1.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-organizations-teams.git",
-                "reference": "a727ec8a5556d0c6c945c15271d8cd41c0b37732"
+                "reference": "57a023aa99cf0b5aca1b124684407a76e8bd48b8"
             },
             "require": {
                 "laravel/jetstream": "^5.5.3",
@@ -7460,25 +7460,26 @@
                 "MIT"
             ],
             "description": "Organization, team, membership, invitation, ownership, and context foundation.",
-            "time": "2026-11-22T05:19:15+00:00"
+            "time": "2026-11-26T12:11:33+00:00"
         },
         {
             "name": "liberusoftware/organizations-teams-filament",
-            "version": "1.6.4",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liberusoftware/module-organizations-teams-filament.git",
-                "reference": "335c9b835bfcab7d77d3c2495e21572d06636521"
+                "reference": "389c38858e92d6b3529552108395e82300232419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liberusoftware/module-organizations-teams-filament/zipball/335c9b835bfcab7d77d3c2495e21572d06636521",
-                "reference": "335c9b835bfcab7d77d3c2495e21572d06636521",
+                "url": "https://api.github.com/repos/liberusoftware/module-organizations-teams-filament/zipball/389c38858e92d6b3529552108395e82300232419",
+                "reference": "389c38858e92d6b3529552108395e82300232419",
                 "shasum": ""
             },
             "require": {
                 "filament/filament": "^5.11.0",
                 "liberusoftware/organizations-teams": "^1.0",
+                "livewire/livewire": "^4.4.8",
                 "php": "^8.5"
             },
             "require-dev": {
@@ -7503,9 +7504,9 @@
             "description": "Filament administration adapter for organizations and teams.",
             "support": {
                 "issues": "https://github.com/liberusoftware/module-organizations-teams-filament/issues",
-                "source": "https://github.com/liberusoftware/module-organizations-teams-filament/tree/v1.6.4"
+                "source": "https://github.com/liberusoftware/module-organizations-teams-filament/tree/v1.7.0"
             },
-            "time": "2026-11-22T00:42:59+00:00"
+            "time": "2026-11-26T12:11:43+00:00"
         },
         {
             "name": "liberusoftware/passkeys",

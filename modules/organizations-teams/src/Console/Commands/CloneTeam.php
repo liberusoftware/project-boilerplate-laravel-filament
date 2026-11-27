@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Console\Commands;
 
-use App\Models\User;
 use Illuminate\Console\Command;
+use Laravel\Jetstream\Jetstream;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\Organizations\Services\TeamCloneService;
 
@@ -25,7 +25,8 @@ class CloneTeam extends Command
         }
 
         $ownerId = $this->option('owner') !== null ? (int) $this->option('owner') : (int) $source->user_id;
-        $owner = User::find($ownerId);
+        $userModel = Jetstream::userModel();
+        $owner = $userModel::find($ownerId);
         if (! $owner) {
             $this->error("Owner user {$ownerId} not found.");
 

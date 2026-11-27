@@ -14,7 +14,7 @@ class TeamFactory extends Factory
         return [
             'name' => $this->faker->unique()->company(),
             'user_id' => config('auth.providers.users.model')::factory(),
-            'personal_team' => true,
+            'personal_team' => false,
         ];
     }
 }

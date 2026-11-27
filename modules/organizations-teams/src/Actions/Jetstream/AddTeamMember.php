@@ -2,9 +2,9 @@
 
 namespace Liberu\Foundation\Organizations\Actions\Jetstream;
 
-use App\Models\User;
 use Closure;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Contracts\AddsTeamMembers;
@@ -19,7 +19,7 @@ class AddTeamMember implements AddsTeamMembers
     /**
      * Add a new team member to the given team.
      */
-    public function add(User $user, Team $team, string $email, ?string $role = null): void
+    public function add(Model $user, Team $team, string $email, ?string $role = null): void
     {
         Gate::forUser($user)->authorize('addTeamMember', $team);
 

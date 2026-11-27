@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Jobs;
 
-use App\Models\User;
-use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Laravel\Jetstream\Jetstream;
+use Liberu\Foundation\Organizations\Contracts\TeamJobNotifier;
 use Liberu\Foundation\Organizations\Models\TeamBackup;
 use Liberu\Foundation\Organizations\Services\TeamRestoreService;
 use Throwable;
@@ -48,12 +48,12 @@ class RestoreTeamBackup implements ShouldQueue
             return;
         }
 
-        $user = User::find($this->notifyUserId);
+        $userModel = Jetstream::userModel();
+        $user = $userModel::find($this->notifyUserId);
         if (! $user) {
             return;
         }
 
-        $notification = Notification::make()->title($title)->body($body);
-        ($success ? $notification->success() : $notification->danger())->sendToDatabase($user);
+        app(TeamJobNotifier::class)->notify($user, $title, $body, $success);
     }
 }

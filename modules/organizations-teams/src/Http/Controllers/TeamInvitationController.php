@@ -72,6 +72,6 @@ class TeamInvitationController extends Controller
             $invitation->delete();
         });
 
-        return redirect(config('fortify.home'))->with('success', __('You have joined the team!'));
+        return redirect((string) (config('fortify.home') ?: '/'))->with('success', __('You have joined the team!'));
     }
 }

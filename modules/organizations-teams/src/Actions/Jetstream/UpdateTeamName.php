@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Actions\Jetstream;
 
-use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Contracts\UpdatesTeamNames;
@@ -17,7 +17,7 @@ class UpdateTeamName implements UpdatesTeamNames
      *
      * @param  array<string, string>  $input
      */
-    public function update(User $user, Team $team, array $input): void
+    public function update(Model $user, Team $team, array $input): void
     {
         Gate::forUser($user)->authorize('update', $team);
 

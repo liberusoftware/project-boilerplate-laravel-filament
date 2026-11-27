@@ -41,9 +41,11 @@ class TeamRestoreService
 
         // ZipArchive needs a local path — stage the artifact to a temp file.
         $tmp = tempnam(sys_get_temp_dir(), 'teamrestore');
+        // @codeCoverageIgnoreStart
         if ($tmp === false) {
             throw new TeamRestoreException('Could not allocate a temp file for the restore.');
         }
+        // @codeCoverageIgnoreEnd
         file_put_contents($tmp, (string) $disk->get($backup->path));
 
         $zip = new ZipArchive();

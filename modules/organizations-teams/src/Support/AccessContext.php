@@ -2,30 +2,14 @@
 
 namespace Liberu\Foundation\Organizations\Support;
 
-use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Record-level access resolver for RestrictsToOwner models.
- *
- * Returns the user id a query must be restricted to (owner-only visibility),
- * or null for "see everything in scope". Only the named restricted roles are
- * owner-scoped; every other role (manager/admin/super_admin), a roleless user,
- * and non-auth contexts (console, queue) see all records in scope.
- *
- * Resolution: an explicit restrictTo()/clear() override (tests, "run as user"
- * jobs) wins; otherwise the authenticated user is resolved lazily via the
- * sanctum guard then the default guard, so it works on both API and web/panel
- * requests at query-build time.
+ * Record-level access resolver for owner/territory-restricted models.
  */
 class AccessContext
 {
-    /** Roles restricted to records they own; all other roles see everything in scope. */
-    private const RESTRICTED_ROLES = ['sales_rep', 'free'];
-
-    /** Roles whose serialized output has sensitive fields masked (MasksFields models). */
-    private const MASKED_ROLES = ['free'];
-
     protected static ?int $ownerId = null;
 
     protected static bool $overridden = false;
@@ -48,15 +32,14 @@ class AccessContext
             return static::$ownerId;
         }
 
-        $user = Auth::guard('sanctum')->user() ?? Auth::user();
-
-        if (! $user instanceof User) {
+        $user = self::resolveUser();
+        if (! $user instanceof Model || ! method_exists($user, 'hasRole')) {
             return null;
         }
 
-        foreach (self::RESTRICTED_ROLES as $role) {
+        foreach (self::restrictedRoles() as $role) {
             if ($user->hasRole($role)) {
-                return $user->getKey();
+                return (int) $user->getKey();
             }
         }
 
@@ -64,21 +47,16 @@ class AccessContext
     }
 
     /**
-     * Territory ids a restricted user is limited to (RestrictsToTerritory models),
-     * or null for see-all. Same restricted-role gate + guard resolution as
-     * restrictToOwnerId. An empty array means a restricted user with no territories.
-     *
      * @return array<int, int>|null
      */
     public static function restrictedTerritoryIds(): ?array
     {
-        $user = Auth::guard('sanctum')->user() ?? Auth::user();
-
-        if (! $user instanceof User) {
+        $user = self::resolveUser();
+        if (! $user instanceof Model || ! method_exists($user, 'hasRole') || ! method_exists($user, 'territories')) {
             return null;
         }
 
-        foreach (self::RESTRICTED_ROLES as $role) {
+        foreach (self::restrictedRoles() as $role) {
             if ($user->hasRole($role)) {
                 return $user->territories()->pluck('territories.id')->all();
             }
@@ -87,24 +65,44 @@ class AccessContext
         return null;
     }
 
-    /**
-     * Whether the current user's serialized output should mask sensitive fields
-     * (MasksFields models). Same guard resolution as the other methods.
-     */
     public static function shouldMaskFields(): bool
     {
-        $user = Auth::guard('sanctum')->user() ?? Auth::user();
-
-        if (! $user instanceof User) {
+        $user = self::resolveUser();
+        if (! $user instanceof Model || ! method_exists($user, 'hasRole')) {
             return false;
         }
 
-        foreach (self::MASKED_ROLES as $role) {
+        foreach (self::maskedRoles() as $role) {
             if ($user->hasRole($role)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static function resolveUser(): ?Model
+    {
+        $user = null;
+
+        if (config('auth.guards.sanctum') !== null) {
+            $user = Auth::guard('sanctum')->user();
+        }
+
+        $user ??= Auth::user();
+
+        return $user instanceof Model ? $user : null;
+    }
+
+    /** @return list<string> */
+    private static function restrictedRoles(): array
+    {
+        return array_values((array) config('organizations-teams.restricted_roles', ['sales_rep', 'free']));
+    }
+
+    /** @return list<string> */
+    private static function maskedRoles(): array
+    {
+        return array_values((array) config('organizations-teams.masked_roles', ['free']));
     }
 }

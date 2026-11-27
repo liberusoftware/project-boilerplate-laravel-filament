@@ -2,8 +2,8 @@
 
 namespace Liberu\Foundation\Organizations\Actions\Jetstream;
 
-use App\Models\User;
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
@@ -22,7 +22,7 @@ class InviteTeamMember implements InvitesTeamMembers
     /**
      * Invite a new team member to the given team.
      */
-    public function invite(User $user, Team $team, string $email, ?string $role = null): void
+    public function invite(Model $user, Team $team, string $email, ?string $role = null): void
     {
         Gate::forUser($user)->authorize('addTeamMember', $team);
 

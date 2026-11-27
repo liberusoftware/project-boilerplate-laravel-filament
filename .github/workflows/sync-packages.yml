@@ -6,6 +6,7 @@ on:
     paths:
       - 'modules/**'
       - 'themes/**'
+      - '.github/package-reconciliations.json'
   workflow_dispatch:
 
 permissions:

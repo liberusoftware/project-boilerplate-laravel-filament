@@ -1,0 +1,126 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Liberu\Foundation\OrganizationsFilament\Resources;
+
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
+use Filament\Panel;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
+use Liberu\Foundation\Organizations\Jobs\RestoreTeamBackup;
+use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\Organizations\Models\TeamBackup;
+use Liberu\Foundation\Organizations\Services\TeamRestoreService;
+use Liberu\Foundation\OrganizationsFilament\Http\Middleware\SetFilamentDefaultTenant;
+use Liberu\Foundation\OrganizationsFilament\Resources\TeamBackupResource\Pages\ListTeamBackups;
+use Liberu\Foundation\RolesPermissions\Enums\Role;
+
+class TeamBackupResource extends Resource
+{
+    protected static ?string $model = TeamBackup::class;
+
+    protected static bool $isScopedToTenant = false;
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box-arrow-down';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Teams';
+
+    public static function isScopedToTenant(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        if ($user === null) {
+            return false;
+        }
+
+        if (method_exists($user, 'isAdmin')) {
+            return (bool) $user->isAdmin();
+        }
+
+        return method_exists($user, 'hasRole') && $user->hasRole(Role::SuperAdmin);
+    }
+
+    public static function getRouteMiddleware(Panel $panel): string|array
+    {
+        return [SetFilamentDefaultTenant::class];
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->defaultSort('created_at', 'desc')
+            ->columns([
+                TextColumn::make('team.name')->label('Team')->searchable(),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'completed' => 'success',
+                        'failed' => 'danger',
+                        'processing' => 'warning',
+                        default => 'gray',
+                    }),
+                TextColumn::make('size_bytes')
+                    ->label('Size')
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 1).' KB' : '—'),
+                TextColumn::make('created_at')->dateTime()->sortable(),
+            ])
+            ->recordActions([
+                Action::make('download')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->visible(fn (TeamBackup $record): bool => $record->status === 'completed' && $record->path !== null)
+                    ->action(fn (TeamBackup $record) => Storage::disk($record->disk)->download((string) $record->path)),
+                Action::make('restore')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Restore this backup?')
+                    ->modalDescription('Re-inserts this team\'s data from the backup. Only runs when the team currently has no data — nothing is overwritten.')
+                    ->visible(fn (TeamBackup $record): bool => $record->status === 'completed' && $record->path !== null)
+                    ->action(function (TeamBackup $record): void {
+                        $team = Team::withoutGlobalScope('archived')->find($record->team_id);
+
+                        if ($team && app(TeamRestoreService::class)->firstPopulatedTable($team) !== null) {
+                            Notification::make()
+                                ->title('Cannot restore')
+                                ->body('That team still has data — restore only runs into an empty team.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        RestoreTeamBackup::dispatch($record->id, auth()->id());
+
+                        Notification::make()->title('Restore queued')->success()->send();
+                    }),
+                DeleteAction::make()
+                    ->before(function (TeamBackup $record): void {
+                        if ($record->path !== null) {
+                            Storage::disk($record->disk)->delete($record->path);
+                        }
+                    }),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListTeamBackups::route('/'),
+        ];
+    }
+}

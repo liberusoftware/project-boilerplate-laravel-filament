@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Laravel\Jetstream\Jetstream;
 use Liberu\Foundation\Organizations\Models\Team;
 
 class TeamSeeder extends Seeder
@@ -15,7 +15,8 @@ class TeamSeeder extends Seeder
      */
     public function run(): void
     {
-        $owner = User::firstOrCreate(
+        $userModel = Jetstream::userModel();
+        $owner = $userModel::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
                 'name' => 'Admin User',

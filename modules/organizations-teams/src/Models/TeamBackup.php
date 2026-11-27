@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Jetstream\Jetstream;
 
 /**
  * Tracking row for a team data-export. Not IsTenantModel — backups are an
@@ -38,6 +38,6 @@ class TeamBackup extends Model
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Jetstream::userModel(), 'created_by');
     }
 }

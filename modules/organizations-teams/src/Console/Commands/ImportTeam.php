@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Liberu\Foundation\Organizations\Console\Commands;
 
-use App\Models\User;
 use Illuminate\Console\Command;
+use Laravel\Jetstream\Jetstream;
 use Liberu\Foundation\Organizations\Services\ImportTeamBackupService;
 
 class ImportTeam extends Command
@@ -23,9 +23,10 @@ class ImportTeam extends Command
             return self::FAILURE;
         }
 
+        $userModel = Jetstream::userModel();
         $owner = $this->option('owner') !== null
-            ? User::find((int) $this->option('owner'))
-            : User::query()->orderBy('id')->first();
+            ? $userModel::find((int) $this->option('owner'))
+            : $userModel::query()->orderBy('id')->first();
 
         if (! $owner) {
             $this->error('No owner user resolved — pass --owner.');
