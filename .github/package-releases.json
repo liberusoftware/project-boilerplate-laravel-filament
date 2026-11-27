@@ -273,11 +273,11 @@
   },
   "liberusoftware/organizations-teams-filament": {
     "path": "modules/organizations-teams-filament",
-    "reference": "335c9b835bfcab7d77d3c2495e21572d06636521",
+    "reference": "f52ae592d1424531b6eae8ed3d58856436e29eac",
     "repository": "https://github.com/liberusoftware/module-organizations-teams-filament",
-    "source_signature": "6acde131c6aca3fe80994365f40928c8a1660592731afb3f45426ad44046510a",
-    "source_tree": "286e227c4baabde08e26fb2bb297f1baa7cb546d",
-    "version": "1.6.4"
+    "source_signature": "ef80e97bcd5a796492693add2a4c7092af4ad14cd55ae71dfed1c0eb81ca7b05",
+    "source_tree": "586ccc30dd13b43244f1c5467e87f031cc793843",
+    "version": "1.8.0"
   },
   "liberusoftware/profiles": {
     "path": "modules/profiles",
