@@ -20,7 +20,7 @@
       "name": "currency-context"
     }
   },
-  "version": "1.7.0",
+  "version": "1.7.1",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\Currency\\Tests\\": "tests/"
