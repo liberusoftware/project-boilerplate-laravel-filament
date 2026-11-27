@@ -104,12 +104,17 @@ final class RoleConfigurationService
     {
         // Preserve a null platform scope instead of invoking the model's tenant-stamping hook.
         DB::table('audit_logs')->insert([
-            'user_id' => $actor->getKey(), 'team_id' => $team?->getKey(),
-            'action' => ($team === null ? 'platform.role_' : 'team.role_').$event,
-            'description' => 'Role '.$role->name.' '.$event,
-            'auditable_type' => $role->getMorphClass(), 'auditable_id' => $role->getKey(),
-            'changes' => json_encode($changes, JSON_THROW_ON_ERROR),
-            'ip_address' => request()->ip() ?? '0.0.0.0', 'created_at' => now(), 'updated_at' => now(),
+            'user_id' => $actor->getKey(),
+            'team_id' => $team?->getKey(),
+            'event' => ($team === null ? 'platform.role_' : 'team.role_').$event,
+            'auditable_type' => $role->getMorphClass(),
+            'auditable_id' => $role->getKey(),
+            'old_values' => isset($changes['before']) ? json_encode($changes['before'], JSON_THROW_ON_ERROR) : null,
+            'new_values' => json_encode($changes['after'] ?? $changes, JSON_THROW_ON_ERROR),
+            'ip_address' => request()->ip() ?? '0.0.0.0',
+            'user_agent' => request()->userAgent(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }

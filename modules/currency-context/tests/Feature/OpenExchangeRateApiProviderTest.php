@@ -41,7 +41,7 @@ it('uses provider timestamps and caches quotes by their base URL', function () {
     expect($euro->rate)->toBe('0.9')
         ->and($euro->base->code)->toBe('USD')
         ->and($euro->quote->code)->toBe('EUR')
-        ->and($euro->source)->toBe('open.er-api.com')
+        ->and($euro->source)->toBe('rates.example.test')
         ->and($euro->type)->toBe('market')
         ->and($euro->precision)->toBe(6)
         ->and($euro->effectiveAt->getTimestamp())->toBe(1700000000)

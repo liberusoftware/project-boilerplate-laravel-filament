@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Gate;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\Foundation\OrganizationsFilament\Resources\TeamResource;
 use Liberu\Foundation\OrganizationsFilament\Resources\TeamResource\Pages\ListTeams;
+use Liberu\Foundation\RolesPermissions\Enums\Role as RoleEnum;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -20,6 +22,14 @@ it('renders the teams list for a super admin', function () {
     $team = Team::factory()->create(['user_id' => $admin->id]);
     $admin->forceFill(['current_team_id' => $team->id])->save();
     $otherTeam = Team::factory()->create();
+
+    setPermissionsTeamId($team->id);
+    Role::firstOrCreate([
+        'name' => RoleEnum::SuperAdmin->value,
+        'guard_name' => 'web',
+        'team_id' => null,
+    ]);
+    $admin->assignRole(RoleEnum::SuperAdmin->value);
 
     Gate::before(fn () => true);
     $this->actingAs($admin);

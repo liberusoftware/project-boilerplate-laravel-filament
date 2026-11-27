@@ -46,6 +46,7 @@ beforeEach(function () {
         $table->unsignedBigInteger('user_id');
         $table->string('name');
         $table->boolean('personal_team');
+        $table->timestamp('archived_at')->nullable();
         $table->timestamps();
     });
 });

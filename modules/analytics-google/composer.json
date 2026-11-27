@@ -19,7 +19,7 @@
       "name": "analytics-google"
     }
   },
-  "version": "1.5.10",
+  "version": "1.6.0",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Analytics\\Google\\Tests\\": "tests/"

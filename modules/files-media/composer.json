@@ -19,7 +19,7 @@
       "name": "files-media"
     }
   },
-  "version": "1.5.10",
+  "version": "1.5.11",
   "autoload-dev": {
     "psr-4": {
       "Liberu\\Foundation\\Files\\Tests\\": "tests/"

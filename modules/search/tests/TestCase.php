@@ -17,6 +17,11 @@ abstract class TestCase extends PackageTestCase
 {
     use UsesTestUser;
 
+    protected function packageRoot(): string
+    {
+        return dirname(__DIR__);
+    }
+
     protected function defineEnvironment($app): void
     {
         parent::defineEnvironment($app);

@@ -2,7 +2,7 @@
   "name": "users-roles",
   "display_name": "Users Roles",
   "description": "Shared users, role lookup, user policies, and user factories.",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "category": "foundation",
   "provider": "Liberu\\Foundation\\UsersRoles\\UsersRolesServiceProvider",
   "requires": {

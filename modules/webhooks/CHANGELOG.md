@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0
+
+- Restore endpoint registration, secret rotation, queueing, and webhook delivery to the shared module.
+
 ## 1.2.2 - 2026-08-06
 
 - Split CI into the three workflows `CONFORMANCE.md` §3.9 asks for, rather than one calling all

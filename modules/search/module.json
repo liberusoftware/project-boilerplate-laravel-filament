@@ -3,7 +3,7 @@
   "name": "search",
   "display_name": "Search",
   "description": "Authorized search queries, filters, pagination, and replaceable model configuration.",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "category": "foundation",
   "provider": "Liberu\\Foundation\\Search\\SearchServiceProvider",
   "requires": {

@@ -1,9 +1,14 @@
 <?php
 
+use Filament\Facades\Filament;
 use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\Foundation\OrganizationsFilament\OrganizationsFilamentPlugin;
+use Liberu\Foundation\OrganizationsFilament\Resources\TeamResource\Pages\EditTeam;
 use Liberu\Foundation\OrganizationsFilament\Resources\TeamResource\Pages\ListTeams;
 use Liberu\Foundation\OrganizationsFilament\Tests\Fixtures\OrganizationUser;
+use Liberu\Foundation\RolesPermissions\Enums\Role;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role as SpatieRole;
 
 /**
  * A record is created rather than asserting `assertOk()` on an empty page: an
@@ -20,6 +25,8 @@ it('renders the team table with its columns resolved', function () {
         'email' => 'ada@example.test',
         'password' => bcrypt('secret'),
     ]);
+    setPermissionsTeamId(null);
+    $owner->assignRole(SpatieRole::firstOrCreate(['name' => Role::SuperAdmin->value, 'guard_name' => 'web', 'team_id' => null]));
 
     Team::forceCreate([
         'user_id' => $owner->id,
@@ -33,4 +40,28 @@ it('renders the team table with its columns resolved', function () {
         ->assertOk()
         ->assertSee('Analytical Engines')
         ->assertSee('Ada Lovelace');
+});
+
+it('renders the edit team page with its delete header action', function () {
+    $owner = OrganizationUser::forceCreate([
+        'name' => 'Ada Lovelace',
+        'email' => 'ada-edit@example.test',
+        'password' => bcrypt('secret'),
+    ]);
+    setPermissionsTeamId(null);
+    $owner->assignRole(SpatieRole::firstOrCreate(['name' => Role::SuperAdmin->value, 'guard_name' => 'web', 'team_id' => null]));
+
+    $team = Team::forceCreate([
+        'user_id' => $owner->id,
+        'name' => 'Analytical Engines',
+        'personal_team' => false,
+    ]);
+
+    $this->actingAs($owner);
+
+    OrganizationsFilamentPlugin::make()->boot(Filament::getPanel('admin'));
+
+    Livewire::test(EditTeam::class, ['record' => $team->getKey()])
+        ->assertOk()
+        ->assertActionExists('delete');
 });

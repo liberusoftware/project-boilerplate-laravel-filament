@@ -35,14 +35,18 @@ beforeEach(function () {
     ];
 
     foreach ($values as $name => $payload) {
-        DB::table('settings')->insert([
-            'group' => SiteSettings::group(),
-            'name' => $name,
-            'locked' => false,
-            'payload' => json_encode($payload, JSON_THROW_ON_ERROR),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::table('settings')->updateOrInsert(
+            [
+                'group' => SiteSettings::group(),
+                'name' => $name,
+            ],
+            [
+                'locked' => false,
+                'payload' => json_encode($payload, JSON_THROW_ON_ERROR),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
     }
 });
 
@@ -66,6 +70,7 @@ it('offers every discovered theme in the theme select', function () {
     // stops resolving it or the discovery returns nothing — which is what would
     // happen if the theme packages were not installed alongside.
     $this->actingAs(TestUser::factory()->create());
+    expect(ManageSiteSettings::getNavigationLabel())->toBe(__('filament.pages.manage_site_settings'));
 
     Livewire::test(ManageSiteSettings::class)
         ->assertOk()

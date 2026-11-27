@@ -259,6 +259,12 @@ namespace {
             });
         }
 
+        if (! Schema::hasColumn('teams', 'zernio_profile_id')) {
+            Schema::table('teams', function (Blueprint $table): void {
+                $table->string('zernio_profile_id')->nullable();
+            });
+        }
+
         if (! Schema::hasColumn('call_settings', 'team_id')) {
             Schema::table('call_settings', function (Blueprint $table): void {
                 $table->unsignedBigInteger('team_id')->nullable();
@@ -287,12 +293,16 @@ namespace {
                 $table->id();
                 $table->unsignedBigInteger('team_id')->nullable();
                 $table->unsignedBigInteger('user_id')->nullable();
-                $table->string('action');
+                $table->string('action')->nullable();
+                $table->string('event')->nullable();
                 $table->text('description')->nullable();
                 $table->string('ip_address')->nullable();
+                $table->string('user_agent')->nullable();
                 $table->string('auditable_type')->nullable();
                 $table->unsignedBigInteger('auditable_id')->nullable();
                 $table->json('changes')->nullable();
+                $table->json('old_values')->nullable();
+                $table->json('new_values')->nullable();
                 $table->timestamps();
             });
         }

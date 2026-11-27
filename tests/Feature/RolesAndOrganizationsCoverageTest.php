@@ -35,7 +35,6 @@ namespace App\Models {
 }
 
 namespace {
-    use App\Events\ContactUpdated;
     use App\Models\Branch;
     use App\Models\Territory;
     use App\Models\User;
@@ -43,11 +42,13 @@ namespace {
     use Illuminate\Auth\Access\AuthorizationException;
     use Illuminate\Auth\Events\Registered;
     use Illuminate\Console\Application;
+    use Illuminate\Database\Eloquent\Model;
     use Illuminate\Database\Eloquent\Relations\HasMany;
     use Illuminate\Database\Eloquent\Relations\HasOne;
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Http\Request;
     use Illuminate\Routing\Route as IlluminateRoute;
+    use Illuminate\Support\Collection;
     use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\DB;
@@ -69,15 +70,12 @@ namespace {
     use Liberu\Foundation\Organizations\Actions\Jetstream\UpdateTeamName;
     use Liberu\Foundation\Organizations\Console\Commands\BackupTeam;
     use Liberu\Foundation\Organizations\Console\Commands\CloneTeam;
-    use Liberu\Foundation\Organizations\Console\Commands\DestroyTeam;
     use Liberu\Foundation\Organizations\Console\Commands\ImportTeam;
     use Liberu\Foundation\Organizations\Console\Commands\RestoreTeam;
     use Liberu\Foundation\Organizations\Exceptions\TeamImportException;
     use Liberu\Foundation\Organizations\Exceptions\TeamNotEmptyException;
     use Liberu\Foundation\Organizations\Exceptions\TeamRestoreException;
     use Liberu\Foundation\Organizations\Http\Controllers\TeamInvitationController;
-    use Liberu\Foundation\Organizations\Http\Middleware\AssignDefaultTeam;
-    use Liberu\Foundation\Organizations\Http\Middleware\SetFilamentDefaultTenant;
     use Liberu\Foundation\Organizations\Http\Middleware\SetPermissionsTeamContext;
     use Liberu\Foundation\Organizations\Http\Middleware\SetTenantContext;
     use Liberu\Foundation\Organizations\Http\Middleware\TeamsPermission;
@@ -86,9 +84,7 @@ namespace {
     use Liberu\Foundation\Organizations\Jobs\RestoreTeamBackup;
     use Liberu\Foundation\Organizations\Listeners\AssignDefaultTeamRole;
     use Liberu\Foundation\Organizations\Listeners\CreatePersonalTeam;
-    use Liberu\Foundation\Organizations\Listeners\NotifyTeamMembers;
     use Liberu\Foundation\Organizations\Listeners\SwitchTeam;
-    use Liberu\Foundation\Organizations\Livewire\CreateTeam as LivewireCreateTeam;
     use Liberu\Foundation\Organizations\Models\Membership;
     use Liberu\Foundation\Organizations\Models\Team;
     use Liberu\Foundation\Organizations\Models\TeamBackup;
@@ -98,14 +94,16 @@ namespace {
     use Liberu\Foundation\Organizations\Services\ImportTeamBackupService;
     use Liberu\Foundation\Organizations\Services\TeamBackupService;
     use Liberu\Foundation\Organizations\Services\TeamCloneService;
-    use Liberu\Foundation\Organizations\Services\TeamDestroyService;
     use Liberu\Foundation\Organizations\Services\TeamManagementService;
     use Liberu\Foundation\Organizations\Services\TeamRestoreService;
     use Liberu\Foundation\Organizations\Support\AccessContext;
+    use Liberu\Foundation\Organizations\Support\NullTeamJobNotifier;
     use Liberu\Foundation\Organizations\Support\PortalCustomer;
     use Liberu\Foundation\Organizations\Support\SchemaGraph;
     use Liberu\Foundation\Organizations\Support\TenantContext;
     use Liberu\Foundation\Organizations\Support\TenantModels;
+    use Liberu\Foundation\OrganizationsFilament\Http\Middleware\AssignDefaultTeam;
+    use Liberu\Foundation\OrganizationsFilament\Http\Middleware\SetFilamentDefaultTenant;
     use Liberu\Foundation\RolesPermissions\Enums\Role as RoleEnum;
     use Liberu\Foundation\RolesPermissions\Models\Role as RoleModel;
     use Liberu\Foundation\RolesPermissions\Services\RoleConfigurationService;
@@ -200,12 +198,16 @@ namespace {
                     $table->id();
                     $table->unsignedBigInteger('team_id')->nullable();
                     $table->unsignedBigInteger('user_id')->nullable();
-                    $table->string('action');
+                    $table->string('action')->nullable();
+                    $table->string('event')->nullable();
                     $table->text('description')->nullable();
                     $table->string('auditable_type')->nullable();
                     $table->unsignedBigInteger('auditable_id')->nullable();
                     $table->json('changes')->nullable();
+                    $table->json('old_values')->nullable();
+                    $table->json('new_values')->nullable();
                     $table->string('ip_address')->nullable();
+                    $table->string('user_agent')->nullable();
                     $table->timestamps();
                 });
             }
@@ -234,6 +236,10 @@ namespace {
                     $table->string('value')->nullable();
                     $table->text('description')->nullable();
                     $table->timestamps();
+                });
+            } elseif (! Schema::hasColumn('call_settings', 'team_id')) {
+                Schema::table('call_settings', function (Blueprint $table): void {
+                    $table->unsignedBigInteger('team_id')->nullable();
                 });
             }
             if (! Schema::hasTable('webhooks')) {
@@ -560,8 +566,35 @@ namespace {
         $this->actingAs($rep);
         setPermissionsTeamId($team->id);
         expect(AccessContext::restrictToOwnerId())->toBe($rep->id)
-            ->and(AccessContext::restrictedTerritoryIds())->toBe([$territory->id])
+            ->and(AccessContext::restrictedTerritoryIds())->toBeNull()
             ->and(AccessContext::shouldMaskFields())->toBeFalse();
+
+        // Cover AccessContext::restrictedTerritoryIds() when user defines territories() relation
+        $territoryUser = new class() extends Illuminate\Foundation\Auth\User
+        {
+            public bool $matchesRole = true;
+
+            public function hasRole(string $role): bool
+            {
+                return $this->matchesRole && $role === 'sales_rep';
+            }
+
+            public function territories(): object
+            {
+                return new class()
+                {
+                    public function pluck(string $column): Collection
+                    {
+                        return collect([7, 9]);
+                    }
+                };
+            }
+        };
+        Auth::forgetGuards();
+        $this->actingAs($territoryUser);
+        expect(AccessContext::restrictedTerritoryIds())->toBe([7, 9]);
+        $territoryUser->matchesRole = false;
+        expect(AccessContext::restrictedTerritoryIds())->toBeNull();
 
         $freeUser = User::factory()->create(['current_team_id' => $team->id]);
         setPermissionsTeamId($team->id);
@@ -801,19 +834,42 @@ namespace {
         $parentNodeId = DB::table('template_nodes')->insertGetId(['team_id' => $team->id, 'parent_id' => null, 'name' => 'Root']);
         DB::table('template_nodes')->insert(['team_id' => $team->id, 'parent_id' => $parentNodeId, 'name' => 'Child']);
 
+        $templateGroupClass = new class() extends Model
+        {
+            protected $table = 'template_groups';
+        };
+        $templateItemClass = new class() extends Model
+        {
+            protected $table = 'template_items';
+        };
+        $templateRuleClass = new class() extends Model
+        {
+            protected $table = 'template_rules';
+        };
+        $templateNodeClass = new class() extends Model
+        {
+            protected $table = 'template_nodes';
+        };
+
+        $missingTableClass = new class() extends Model
+        {
+            protected $table = 'nonexistent_clone_table';
+        };
+
         config([
-            'organizations-teams.clone.models' => [
-                'template_groups',
-                'template_items',
-                'template_rules',
-                'template_nodes',
-                'missing_table_ignored',
+            'organizations-teams.cloneable_models' => [
+                $templateGroupClass::class,
+                $templateItemClass::class,
+                $templateRuleClass::class,
+                $templateNodeClass::class,
+                $missingTableClass::class,
                 'NonExistent\\Model\\ClassIgnored',
             ],
-            'organizations-teams.clone.fk_edges' => [
-                'template_items' => ['group_id' => 'template_groups'],
-                'template_rules' => ['rule_parent_id' => 'template_items'],
-                'template_nodes' => ['parent_id' => 'template_nodes'],
+            'organizations-teams.clone_fk_edges' => [
+                $templateItemClass::class => ['group_id' => $templateGroupClass::class],
+                $templateRuleClass::class => ['rule_parent_id' => $templateItemClass::class],
+                $templateNodeClass::class => ['parent_id' => $templateNodeClass::class],
+                'NonExistent\\Model\\ClassIgnored' => ['parent_id' => $templateNodeClass::class],
             ],
         ]);
 
@@ -829,28 +885,7 @@ namespace {
             ->and((int) $clonedChild->parent_id)->toBe((int) $clonedRoot->id)
             ->and(SchemaGraph::edges(['nonexistent_table']))->toBe([]);
 
-        // TeamDestroyService
-        $personalToProtect = Team::factory()->create(['user_id' => $importer->id, 'personal_team' => true]);
-        $importer->forceFill(['current_team_id' => $clonedTeam->id])->save();
-        Storage::disk('local')->put('backups/destroy-me.zip', 'zip');
-        TeamBackup::create([
-            'team_id' => $clonedTeam->id,
-            'disk' => 'local',
-            'path' => 'backups/destroy-me.zip',
-            'status' => 'completed',
-        ]);
-
-        $destroyService = new TeamDestroyService();
-        expect(fn () => $destroyService->destroy($personalToProtect))
-            ->toThrow(DomainException::class, 'Personal teams cannot be destroyed.');
-
-        $destroyedCounts = $destroyService->destroy($clonedTeam);
-        expect($destroyedCounts['teams'] ?? 0)->toBe(1)
-            ->and(Team::withArchived()->whereKey($clonedTeam->id)->exists())->toBeFalse()
-            ->and($importer->fresh()->current_team_id)->toBe($personalToProtect->id);
-        Storage::disk('local')->assertMissing('backups/destroy-me.zip');
-
-        config(['organizations-teams.clone.models' => [], 'organizations-teams.clone.fk_edges' => []]);
+        config(['organizations-teams.cloneable_models' => [], 'organizations-teams.clone_fk_edges' => []]);
     });
 
     it('covers TeamManagementService and all branches', function (): void {
@@ -943,23 +978,23 @@ namespace {
         $service->removeTeamMember($member, $team);
         expect($team->users()->whereKey($member->id)->exists())->toBeFalse();
 
-        // createDefaultTeamForUser & assignUserToDefaultTeam & switchTeam
+        // createPersonalTeamForUser & assignUserToDefaultTeam & switchTeam
         Team::query()->delete();
-        config(['organizations-teams.default_team_name' => 'HQ Team']);
         $user2 = User::factory()->create();
         $service->assignUserToDefaultTeam($user2);
-        expect($user2->fresh()->currentTeam->name)->toBe('HQ Team');
+        expect($user2->fresh()->currentTeam->name)->toBe($user2->name."'s Team");
 
-        // Assign another user to existing default team
+        // Assign another user to an existing non-personal default team
+        $sharedTeam = Team::factory()->create(['user_id' => $user2->id, 'name' => 'HQ Team', 'personal_team' => false]);
         $user3 = User::factory()->create();
         $service->assignUserToDefaultTeam($user3);
-        expect($user3->fresh()->current_team_id)->toBe($user2->fresh()->current_team_id);
+        expect($user3->fresh()->current_team_id)->toBe($sharedTeam->id);
 
         // switchTeam
         $unjoinedTeam = Team::factory()->create(['personal_team' => false]);
         expect(fn () => $service->switchTeam($user3, $unjoinedTeam))
             ->toThrow(Exception::class, 'User does not belong to the specified team.');
-        $service->switchTeam($user3, $user2->fresh()->currentTeam);
+        $service->switchTeam($user3, $sharedTeam);
     });
 
     it('covers Console commands and Jobs for team backup, clone, import, and restore', function (): void {
@@ -967,7 +1002,6 @@ namespace {
             $artisan->resolveCommands([
                 BackupTeam::class,
                 CloneTeam::class,
-                DestroyTeam::class,
                 ImportTeam::class,
                 RestoreTeam::class,
             ]);
@@ -1113,18 +1147,12 @@ namespace {
         $resp2 = $controller->acceptInvitation($acceptReq2, $inv2->id);
         expect($resp2->getStatusCode())->toBe(302);
 
-        // Livewire CreateTeam component
+        // Middleware: AssignDefaultTeam & SetFilamentDefaultTenant & SetPermissionsTeamContext & SetTenantContext
         Route::get('/_test/tenant-profile/{tenant}', fn () => 'ok')->name('filament.app.tenant.profile');
         Route::get('/_test/login', fn () => 'login')->name('login');
         Route::get('/_test/home', fn () => 'home')->name('home');
         app('router')->getRoutes()->refreshNameLookups();
 
-        $this->actingAs($owner);
-        $appLivewire = new LivewireCreateTeam();
-        $appLivewire->state = ['name' => 'App Livewire Team'];
-        expect($appLivewire->createTeam($creator))->not->toBeNull();
-
-        // Middleware: AssignDefaultTeam & SetFilamentDefaultTenant & SetPermissionsTeamContext & SetTenantContext
         expect(new SetPermissionsTeamContext())->toBeInstanceOf(Liberu\Foundation\Tenancy\Http\Middleware\SetPermissionsTeamContext::class)
             ->and(new SetTenantContext())->toBeInstanceOf(Liberu\Foundation\Tenancy\Http\Middleware\SetTenantContext::class);
 
@@ -1196,9 +1224,9 @@ namespace {
         $repUser->givePermissionTo($colonPerm);
         expect($tp->handle($resReq, fn () => response('ok'))->getContent())->toBe('ok');
 
-        // Listeners
+        // Listeners & NullTeamJobNotifier
         expect(new SwitchTeam())->toBeInstanceOf(Liberu\Foundation\Tenancy\Listeners\SwitchTeam::class);
-        (new NotifyTeamMembers())->handle(new stdClass());
+        (new NullTeamJobNotifier())->notify($owner, 'Backup', 'Completed', true);
         (new AssignDefaultTeamRole(app(TeamManagementService::class)))->handle(new TeamMemberAdded($team, $repUser));
         (new CreatePersonalTeam(app(TeamManagementService::class)))->handle(new Registered(User::factory()->create()));
         (new ProvisionZernioProfile(new ZernioTenantService(new ZernioClient())))->handle(new TeamCreated($team));

@@ -3,57 +3,89 @@
 namespace Liberu\Foundation\OrganizationsFilament\Tests;
 
 use Filament\Facades\Filament;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Jetstream\Jetstream;
 use Liberu\Foundation\Organizations\OrganizationsServiceProvider;
 use Liberu\Foundation\OrganizationsFilament\Tests\Fixtures\OrganizationUser;
 use Liberu\Foundation\OrganizationsFilament\Tests\Fixtures\TestPanelProvider;
+use Liberu\Foundation\RolesPermissions\RolesPermissionsServiceProvider;
+use Liberu\Foundation\Tenancy\TenancyServiceProvider;
 use Liberu\PackageTestbench\PackageTestCase;
 use Liberu\PackageTestbench\UsesTestUser;
+use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\PermissionServiceProvider;
 
-/**
- * Filament is the one dependency `PackageTestCase`'s scoped discovery cannot
- * cover on its own.
- *
- * It registers `extra.laravel.providers` of this package's *direct*
- * dependencies, which for `filament/filament` is exactly one provider. A panel
- * needs the rest of the stack — support, schemas, forms, tables, actions,
- * notifications, widgets, Livewire, the icon packages — and every one of those
- * is transitive. So this widens the same walk to everything installed, which is
- * what Laravel's own discovery does in an application, and appends the fixture
- * panel.
- */
 abstract class TestCase extends PackageTestCase
 {
     use UsesTestUser;
+
+    private string $previousJetstreamUserModel = '';
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Nothing has resolved a panel from a request, and a resource page needs
-        // one to be current before it can mount.
         Filament::setCurrentPanel('admin');
 
-        // Team extends Jetstream's, whose owner() resolves Jetstream::userModel().
-        // That is a static property defaulting to App\Models\User — a class no
-        // package may depend on — so config alone does not redirect it.
+        $this->previousJetstreamUserModel = Jetstream::userModel();
         Jetstream::useUserModel(OrganizationUser::class);
+
+        if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'current_team_id')) {
+            Schema::table('users', function (Blueprint $table): void {
+                $table->unsignedBigInteger('current_team_id')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable('audit_logs')) {
+            Schema::create('audit_logs', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('user_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->string('event')->nullable();
+                $table->string('action')->nullable();
+                $table->text('description')->nullable();
+                $table->string('auditable_type')->nullable();
+                $table->unsignedBigInteger('auditable_id')->nullable();
+                $table->json('old_values')->nullable();
+                $table->json('new_values')->nullable();
+                $table->string('ip_address')->nullable();
+                $table->string('user_agent')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('notifications')) {
+            Schema::create('notifications', function (Blueprint $table): void {
+                $table->uuid('id')->primary();
+                $table->string('type');
+                $table->morphs('notifiable');
+                $table->text('data');
+                $table->timestamp('read_at')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->previousJetstreamUserModel !== '') {
+            Jetstream::useUserModel($this->previousJetstreamUserModel);
+        }
+
+        parent::tearDown();
     }
 
     protected function defineEnvironment($app): void
     {
         parent::defineEnvironment($app);
 
-        // The table's owner.name column resolves Team::owner(), which points at
-        // whatever model this names — and TeamPolicy type-hints OrganizationActor,
-        // which the plain testbench actor deliberately does not implement.
         $app['config']->set('auth.providers.users.model', OrganizationUser::class);
-
-        // Team is activity-logged. That belongs to the audit module and its
-        // migration, neither of which this package depends on; leaving it on
-        // would make a resource test fail on a missing activity_log table.
         $app['config']->set('activitylog.enabled', false);
-
+        $app['config']->set('permission.teams', true);
+        $app['config']->set('permission.column_names.team_foreign_key', 'team_id');
     }
 
     /**
@@ -63,11 +95,9 @@ abstract class TestCase extends PackageTestCase
     {
         return array_values(array_unique([
             ...$this->discoveredProviders(),
-            // A `require` sibling, so its manifest declares no providers and nothing
-            // boots it — installation never implies boot. Named here because this
-            // resource has no table to query without the teams migration it loads.
-            // Declaring it in require-dev as well would earn a duplication warning
-            // from `composer validate` for saying nothing true.
+            PermissionServiceProvider::class,
+            RolesPermissionsServiceProvider::class,
+            TenancyServiceProvider::class,
             OrganizationsServiceProvider::class,
             ...parent::getPackageProviders($app),
             TestPanelProvider::class,
@@ -75,12 +105,6 @@ abstract class TestCase extends PackageTestCase
     }
 
     /**
-     * Every `extra.laravel.providers` entry in the installed tree.
-     *
-     * Sibling Liberu modules are unaffected: their manifests declare that array
-     * empty precisely so installation never implies boot, so this picks up the
-     * framework packages and nothing else.
-     *
      * @return array<int, class-string>
      */
     private function discoveredProviders(): array
