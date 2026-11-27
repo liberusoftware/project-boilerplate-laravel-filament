@@ -9,9 +9,9 @@ FROM php:${PHP_VERSION}-cli-alpine AS composer-deps
 
 WORKDIR /app
 
-# Install required extensions for composer install
+# Install required packages and PHP extensions for composer install
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-RUN install-php-extensions intl sockets zip
+RUN apk add --no-cache git unzip && install-php-extensions intl sockets zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
