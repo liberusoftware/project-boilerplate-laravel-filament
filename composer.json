@@ -166,6 +166,20 @@
     "prefer-stable": true,
     "repositories": [
         {
+            "type": "path",
+            "url": "modules/organizations-teams",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
+            "type": "path",
+            "url": "modules/organizations-teams-filament",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
             "type": "git",
             "url": "https://github.com/liberusoftware/module-module-manager-filament.git",
             "only": [
