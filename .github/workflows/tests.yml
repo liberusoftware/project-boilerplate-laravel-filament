@@ -27,6 +27,7 @@ jobs:
           php-version: '8.5'
           extensions: mbstring, pdo, pdo_sqlite, bcmath, opcache, zip, gd, intl, dom, curl
           coverage: pcov
+          ini-values: pcov.directory=${{ github.workspace }}, memory_limit=512M
 
       - name: Get composer cache directory
         id: composer-cache
@@ -63,8 +64,9 @@ jobs:
         run: php artisan key:generate
 
       # Measure coverage across both app/ and modules/*/src (configured in phpunit.xml).
+      # Invoke Pest directly so pcov.directory from php.ini / -d applies in-process.
       - name: Run tests
-        run: php -d memory_limit=512M -d pcov.directory=. artisan test --coverage --coverage-clover=coverage.xml --min=100
+        run: php -d memory_limit=512M -d pcov.directory=. vendor/bin/pest --coverage --coverage-clover=coverage.xml --min=100
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
